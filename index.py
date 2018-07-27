@@ -1,28 +1,28 @@
-from flask import Flask, render_template
 import os
+
+from flask import Flask, render_template
 
 
 DATA_FOLDER = 'test-data/results-archive'
 
+server = Flask(__name__)
 
-app = Flask(__name__)
 
-
-@app.route("/")
+@server.route("/")
 def index():
     return render_template('index.html')
 
 
-@app.route("/runs")
+@server.route("/runs")
 def runs():
     runs = os.listdir(DATA_FOLDER)
     return render_template('runs.html', runs=runs)
 
 
-@app.route("/runs/<run_id>")
+@server.route("/runs/<run_id>")
 def specific_run(run_id):
-    return run_id
+    return render_template('run.html', run_id=run_id)
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    server.run(debug=True)
