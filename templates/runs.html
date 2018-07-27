@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ name }}</title>
+</head>
+<body>
+    <h2>Runs available:</h2>
+    <ul>
+        {% for run in runs %}
+        <li><a href="runs/{{ run }}">{{ run }}</a></li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
