@@ -4,6 +4,7 @@ from flask import Flask, render_template
 
 
 DATA_FOLDER = 'test-data/results-archive'
+DATA_SUMMARY_FOLDER = 'qc'
 
 server = Flask(__name__)
 
