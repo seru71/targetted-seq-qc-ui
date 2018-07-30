@@ -3,12 +3,12 @@ import dash_core_components as dcc
 import dash_html_components as html
 import dash_table_experiments as dt
 
-from data_preparation import get_sample_summary, get_sample_gene_summary, prepare_mean_columns_df
+from data_preparation import get_summary, get_gene_summary, prepare_mean_columns_df
 
 
-def run_information():
-    sample_summary = get_sample_summary()
-    sample_gene_summary = get_sample_gene_summary()
+def run_information(run_id):
+    sample_summary = get_summary(run_id)
+    sample_gene_summary = get_gene_summary(run_id)
     unique_genes = set([x.split('_')[0] for x in sample_gene_summary.Gene])
 
     app = dash.Dash()
@@ -53,5 +53,5 @@ def run_information():
 
 
 if __name__ == '__main__':
-    app = run_information()
+    app = run_information('171030_NB551023_0034_AHYF5YBGX2')
     app.run_server(debug=True)

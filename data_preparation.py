@@ -1,15 +1,16 @@
 import pandas as pd
 import os
 
-DATA_FILE = 'data'
+from index import DATA_FOLDER, DATA_SUMMARY_FOLDER
 
 
-def get_sample_summary():
+def get_summary(run_id):
     columns = ['sample_id', 'total', 'mean', '%_bases_above_5', '%_bases_above_10', '%_bases_above_20']
     new_columns = ['Sample ID', 'Total', 'Mean', 'Above 5%', 'Above 10%', 'Above 20%']
 
-    sample_summary = pd.read_csv(os.path.join(DATA_FILE, 'all_sample.gene_coverage.sample_summary'), delimiter='\t',
-                                 index_col=False, usecols=columns)
+    summary_path = os.path.join(DATA_FOLDER, run_id, DATA_SUMMARY_FOLDER, f'{run_id}.sample_coverage')
+
+    sample_summary = pd.read_csv(summary_path, delimiter='\t', index_col=False, usecols=columns)
     sample_summary.rename(columns=dict(zip(columns, new_columns)), inplace=True)
 
     sample_summary.drop(sample_summary.index[-1], inplace=True)
@@ -29,13 +30,14 @@ def prepare_mean_columns_df(df):
     return df.drop(columns=columns[3:])
 
 
-def get_sample_gene_summary():
-    sample_gene_summary = pd.read_csv(os.path.join(DATA_FILE, 'all_sample.gene_coverage.sample_gene_summary'),
-                                      delimiter='\t', index_col=False)
+def get_gene_summary(run_id):
+    summary_path = os.path.join(DATA_FOLDER, run_id, DATA_SUMMARY_FOLDER, f'{run_id}.gene_coverage')
+
+    sample_gene_summary = pd.read_csv(summary_path, delimiter='\t', index_col=False)
     return sample_gene_summary
 
 
 if __name__ == '__main__':
     # all_metrics = pd.read_csv(os.path.join(DATA_FILE, 'all_sample.alignment_metrics'), delimiter='\t')
-    # print(get_sample_summary())
-    print(get_sample_gene_summary())
+    print(get_summary('171030_NB551023_0034_AHYF5YBGX2'))
+    print(get_gene_summary('171030_NB551023_0034_AHYF5YBGX2'))
