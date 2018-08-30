@@ -1,6 +1,7 @@
 import os
 
 from flask import Flask, render_template
+import data_preparation
 
 
 DATA_FOLDER = 'test-data/results-archive'
@@ -22,7 +23,8 @@ def runs():
 
 @server.route("/runs/<run_id>")
 def specific_run(run_id):
-    return render_template('run.html', run_id=run_id)
+    sample_summary_table = data_preparation.get_summary(run_id).to_html()
+    return render_template('run.html', run_id=run_id, sample_summary_table=sample_summary_table)
 
 
 if __name__ == '__main__':
