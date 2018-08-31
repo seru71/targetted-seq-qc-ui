@@ -45,8 +45,8 @@ def specific_sample(run_id, sample_id):
     data = {'run_id': run_id, 'sample_id': sample_id}
 
     sample_path = os.path.join(DATA_FOLDER, run_id, sample_id)
-    coverage_sample_summary_path = (os.path.join(sample_path, f'{sample_id}.coverage.sample_summary'))
-    coverage_sample_gene_summary_path = (os.path.join(sample_path, f'{sample_id}.coverage.sample_gene_summary'))
+    coverage_sample_summary_path = (os.path.join(sample_path, '{}.coverage.sample_summary'.format(sample_id)))
+    coverage_sample_gene_summary_path = (os.path.join(sample_path, '{}.coverage.sample_gene_summary').format(sample_id))
 
     coverage_sample_summary = pd.read_csv(coverage_sample_summary_path, delimiter='\t', index_col=False).dropna()
     coverage_sample_gene_summary = pd.read_csv(coverage_sample_gene_summary_path, delimiter='\t', index_col=False)[:100]
