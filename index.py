@@ -5,7 +5,7 @@ import data_preparation
 
 from flask import Flask, render_template, request
 
-DATA_FOLDER = os.path.join(*['test-data', 'results-archive'])
+DATA_FOLDER = os.path.join(*['static', 'test-data', 'results-archive'])
 DATA_SUMMARY_FOLDER = 'qc'
 
 server = Flask(__name__)
@@ -42,14 +42,18 @@ def samples():
 
 @server.route("/samples/<run_id>/<sample_id>", methods=['GET', 'POST'])
 def specific_sample(run_id, sample_id):
-    data = {'run_id': run_id, 'sample_id': sample_id}
+    data = {'run_id': run_id, 'sample_id': sample_id, 'fastq_path': None, 'bam_path': None, 'vcf_path': None}
 
     sample_path = os.path.join(DATA_FOLDER, run_id, sample_id)
     coverage_sample_summary_path = (os.path.join(sample_path, '{}.coverage.sample_summary'.format(sample_id)))
     coverage_sample_gene_summary_path = (os.path.join(sample_path, '{}.coverage.sample_gene_summary').format(sample_id))
 
+    data['fastq_path'] = None
+    data['bam_path'] = 'http://127.0.0.1:5000/{}/{}.dedup.bam'.format(sample_path.replace(os.sep, '/'), sample_id)
+    data['vcf_path'] = 'http://127.0.0.1:5000/{}/{}.vcf'.format(sample_path.replace(os.sep, '/'), sample_id)
+
     coverage_sample_summary = pd.read_csv(coverage_sample_summary_path, delimiter='\t', index_col=False).dropna()
-    coverage_sample_gene_summary = pd.read_csv(coverage_sample_gene_summary_path, delimiter='\t', index_col=False)[:100]
+    coverage_sample_gene_summary = pd.read_csv(coverage_sample_gene_summary_path, delimiter='\t', index_col=False)
 
     data['coverage_sample_summary'] = coverage_sample_summary.to_html()
 
@@ -89,9 +93,7 @@ def specific_run(run_id):
             df = mean_cols_df.loc[mean_cols_df['gene_name'].isin(data['genes'])]
 
             df.drop(columns=['gene_name'], inplace=True)
-
             df = data_preparation.prepare_mean_columns_df(df)
-
             data['selected_genes_df'] = df.to_html()
         except Exception as e:
             print(e)

@@ -8,6 +8,12 @@
     <h3><b>Run ID:</b> {{ run_id }}</h3>
     <h3><b>Sample ID:</b> {{ sample_id }}</h3>
     {{ coverage_sample_summary|safe }}
+
+    <h3>Download:</h3>
+    <p>FASTQ</p>
+    <p><a href="{{ bam_path }}">BAM</a></p>
+    <p><a href="{{ vcf_path }}">VCF</a></p>
+
     <h3>Gene coverage:</h3>
 
     <p>Please enter gene names separated by the comma (for example "OR4F16, TTLL10").</p>
