@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Samples</title>
+</head>
+<body>
+    <h2>Samples available:</h2>
+        {% for key, value in samples.items() %}
+        <h3>{{ key }}</h3>
+            {% for run_id, sample_id in value %}
+            <ul>
+                <li><a href="samples/{{ run_id }}/{{ sample_id }}">{{ sample_id }}</a></li>
+            </ul>
+            {% endfor %}
+        {% endfor %}
+</body>
+</html>
