@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sample</title>
+</head>
+<body>
+    <h3><b>Run ID:</b> {{ run_id }}</h3>
+    <h3><b>Sample ID:</b> {{ sample_id }}</h3>
+    {{ coverage_sample_summary|safe }}
+    <h3>Gene coverage:</h3>
+
+    <p>Please enter gene names separated by the comma (for example "OR4F16, TTLL10").</p>
+    <form method="POST", name="genes">
+        <input name="gene_names">
+        <input type="submit">
+    </form>
+
+    {% if genes %}
+        <p><b>Genes selected: </b>
+        {% for gene in genes %}
+            '{{ gene }}'
+        {% endfor %}
+        </p>
+
+        {% if coverage_sample_gene_summary %}
+            {{ coverage_sample_gene_summary|safe }}
+        {% endif %}
+    {% endif %}
+</body>
+</html>
