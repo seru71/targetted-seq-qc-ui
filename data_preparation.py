@@ -31,7 +31,7 @@ def prepare_mean_columns_df(df):
 
 
 def get_gene_summary(run_id):
-    summary_path = os.path.join(DATA_FOLDER, run_id, DATA_SUMMARY_FOLDER, f'{run_id}.gene_coverage')
+    summary_path = os.path.join(DATA_FOLDER, run_id, DATA_SUMMARY_FOLDER, '{}.gene_coverage'.format(run_id))
 
     sample_gene_summary = pd.read_csv(summary_path, delimiter='\t', index_col=False)
     return sample_gene_summary
