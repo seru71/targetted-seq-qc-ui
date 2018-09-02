@@ -233,6 +233,6 @@ $RECYCLE.BIN/
 *.lnk
 
 # Data folder
-*.data
+data/
 
 # End of https://www.gitignore.io/api/linux,python,windows,pycharm+all,jupyternotebook
