@@ -1,10 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "index.html" %}
 
-
-<head>
-    <meta charset="UTF-8">
-    <title>Specific run information</title>
+{% block content %}
     <h3><b>Run ID:</b> {{ run_id }}</h3>
     {{ sample_summary_table|safe }}
 
@@ -29,8 +25,4 @@
 
 
     <h3>Variants</h3>
-</head>
-<body>
-
-</body>
-</html>
+{% endblock %}

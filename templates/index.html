@@ -5,8 +5,11 @@
     <title>NGS</title>
 </head>
 <body>
-    <a href="/runs">runs</a>
-    <br>
-    <a href="/samples">samples</a>
+    <div>
+        <a href="/runs">runs</a>
+        <a href="/samples">samples</a>
+        <hr>
+        {% block content %}{% endblock %}
+    </div>
 </body>
 </html>
