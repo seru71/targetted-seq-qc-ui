@@ -5,7 +5,7 @@ import data_preparation
 
 from flask import Flask, render_template, request
 
-DATA_FOLDER = os.path.join(*['test-data', 'results-archive'])
+DATA_FOLDER = os.path.join(*['static', 'test-data', 'results-archive'])
 DATA_SUMMARY_FOLDER = 'qc'
 
 server = Flask(__name__)
@@ -42,16 +42,20 @@ def samples():
 
 @server.route("/samples/<run_id>/<sample_id>", methods=['GET', 'POST'])
 def specific_sample(run_id, sample_id):
-    data = {'run_id': run_id, 'sample_id': sample_id}
+    data = {'run_id': run_id, 'sample_id': sample_id, 'fastq_path': None, 'bam_path': None, 'vcf_path': None}
 
     sample_path = os.path.join(DATA_FOLDER, run_id, sample_id)
     coverage_sample_summary_path = (os.path.join(sample_path, '{}.coverage.sample_summary'.format(sample_id)))
     coverage_sample_gene_summary_path = (os.path.join(sample_path, '{}.coverage.sample_gene_summary').format(sample_id))
 
-    coverage_sample_summary = pd.read_csv(coverage_sample_summary_path, delimiter='\t', index_col=False).dropna()
-    coverage_sample_gene_summary = pd.read_csv(coverage_sample_gene_summary_path, delimiter='\t', index_col=False)[:100]
+    data['fastq_path'] = None
+    data['bam_path'] = '../../{}/{}.dedup.bam'.format(sample_path.replace(os.sep, '/'), sample_id)
+    data['vcf_path'] = '../../{}/{}.vcf'.format(sample_path.replace(os.sep, '/'), sample_id)
 
-    data['coverage_sample_summary'] = coverage_sample_summary.to_html()
+    coverage_sample_summary = pd.read_csv(coverage_sample_summary_path, delimiter='\t', index_col=False).dropna()
+    coverage_sample_gene_summary = pd.read_csv(coverage_sample_gene_summary_path, delimiter='\t', index_col=False)
+
+    data['coverage_sample_summary'] = coverage_sample_summary.to_html(classes='table table-sm table-hover')
 
     if request.method == 'POST' and request.form.get('gene_names'):
         try:
@@ -64,7 +68,7 @@ def specific_sample(run_id, sample_id):
 
             df = data_preparation.prepare_mean_columns_df(df)
 
-            data['coverage_sample_gene_summary'] = df.to_html()
+            data['coverage_sample_gene_summary'] = df.to_html(classes='table table-sm table-hover')
         except Exception as e:
             print(e)
             pass
@@ -79,7 +83,9 @@ def specific_run(run_id):
 
     unique_genes = set([x.split('_')[0] for x in mean_cols_df.Gene])
 
-    data = {'run_id': run_id, 'sample_summary_table': sample_summary_table.to_html(), 'unique_genes': unique_genes}
+    data = {'run_id': run_id,
+            'sample_summary_table': sample_summary_table.to_html(classes='table table-sm table-hover'),
+            'unique_genes': unique_genes}
 
     if request.method == 'POST' and request.form.get('gene_names'):
         try:
@@ -89,10 +95,8 @@ def specific_run(run_id):
             df = mean_cols_df.loc[mean_cols_df['gene_name'].isin(data['genes'])]
 
             df.drop(columns=['gene_name'], inplace=True)
-
             df = data_preparation.prepare_mean_columns_df(df)
-
-            data['selected_genes_df'] = df.to_html()
+            data['selected_genes_df'] = df.to_html(classes='table table-sm table-hover')
         except Exception as e:
             print(e)
             pass
@@ -101,4 +105,7 @@ def specific_run(run_id):
 
 
 if __name__ == '__main__':
-    server.run(debug=True)
+    if int(os.environ.get('FLASK_DEBUG', 0)):
+        server.run(debug=True)
+    else:
+        server.run(host='0.0.0.0')

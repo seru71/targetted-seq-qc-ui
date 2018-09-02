@@ -1,13 +1,32 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Sample</title>
-</head>
-<body>
+{% extends "index.html" %}
+
+{% block content %}
     <h3><b>Run ID:</b> {{ run_id }}</h3>
     <h3><b>Sample ID:</b> {{ sample_id }}</h3>
     {{ coverage_sample_summary|safe }}
+
+    <div>
+        <h3>Download:</h3>
+
+        {% if fastq_path %}
+        <a class="btn btn-primary" href="{{ fastq_path }}" role="button">FASTQ</a>
+        {% else %}
+        <a class="btn btn-secondary disabled" href="{{ fastq_path }}" role="button">FASTQ</a>
+        {% endif %}
+
+        {% if bam_path %}
+        <a class="btn btn-primary" href="{{ bam_path }}" role="button">BAM</a>
+        {% else %}
+        <a class="btn btn-secondary disabled" href="{{ bam_path }}" role="button">BAM</a>
+        {% endif %}
+
+        {% if vcf_path %}
+        <a class="btn btn-primary" href="{{ vcf_path }}" role="button">VCF</a>
+        {% else %}
+        <a class="btn btn-secondary disabled" href="{{ vcf_path }}" role="button">VCF</a>
+        {% endif %}
+    </div>
+
     <h3>Gene coverage:</h3>
 
     <p>Please enter gene names separated by the comma (for example "OR4F16, TTLL10").</p>
@@ -27,5 +46,4 @@
             {{ coverage_sample_gene_summary|safe }}
         {% endif %}
     {% endif %}
-</body>
-</html>
+{% endblock %}
