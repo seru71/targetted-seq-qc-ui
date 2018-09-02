@@ -49,8 +49,14 @@ def specific_sample(run_id, sample_id):
     coverage_sample_gene_summary_path = (os.path.join(sample_path, '{}.coverage.sample_gene_summary').format(sample_id))
 
     data['fastq_path'] = None
-    data['bam_path'] = '../../{}/{}.dedup.bam'.format(sample_path.replace(os.sep, '/'), sample_id)
-    data['vcf_path'] = '../../{}/{}.vcf'.format(sample_path.replace(os.sep, '/'), sample_id)
+
+    bam_path = '{}/{}.dedup.bam'.format(sample_path.replace(os.sep, '/'), sample_id)
+    bam_file_exists = os.path.isfile(bam_path.replace('/', os.sep))
+    data['bam_path'] = '../../' + bam_path if bam_file_exists else False
+
+    vcf_path = '{}/{}.vcf'.format(sample_path.replace(os.sep, '/'), sample_id)
+    vcf_file_exists = os.path.isfile(vcf_path.replace('/', os.sep))
+    data['vcf_path'] = '../../' + vcf_path if vcf_file_exists else False
 
     coverage_sample_summary = pd.read_csv(coverage_sample_summary_path, delimiter='\t', index_col=False).dropna()
     coverage_sample_gene_summary = pd.read_csv(coverage_sample_gene_summary_path, delimiter='\t', index_col=False)
