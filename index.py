@@ -49,8 +49,8 @@ def specific_sample(run_id, sample_id):
     coverage_sample_gene_summary_path = (os.path.join(sample_path, '{}.coverage.sample_gene_summary').format(sample_id))
 
     data['fastq_path'] = None
-    data['bam_path'] = 'http://127.0.0.1:5000/{}/{}.dedup.bam'.format(sample_path.replace(os.sep, '/'), sample_id)
-    data['vcf_path'] = 'http://127.0.0.1:5000/{}/{}.vcf'.format(sample_path.replace(os.sep, '/'), sample_id)
+    data['bam_path'] = '../../{}/{}.dedup.bam'.format(sample_path.replace(os.sep, '/'), sample_id)
+    data['vcf_path'] = '../../{}/{}.vcf'.format(sample_path.replace(os.sep, '/'), sample_id)
 
     coverage_sample_summary = pd.read_csv(coverage_sample_summary_path, delimiter='\t', index_col=False).dropna()
     coverage_sample_gene_summary = pd.read_csv(coverage_sample_gene_summary_path, delimiter='\t', index_col=False)
@@ -105,4 +105,7 @@ def specific_run(run_id):
 
 
 if __name__ == '__main__':
-    server.run(debug=True)
+    if int(os.environ.get('FLASK_DEBUG')):
+        server.run(debug=True)
+    else:
+        server.run(host='0.0.0.0')
