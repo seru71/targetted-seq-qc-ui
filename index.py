@@ -2,7 +2,8 @@ import os
 import glob
 import pandas as pd
 
-import matplotlib.pyplot as plt
+import matplotlib
+matplotlib.use("Agg")
 
 import data_preparation
 
