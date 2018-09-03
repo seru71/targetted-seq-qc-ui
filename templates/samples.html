@@ -6,7 +6,7 @@
         <h3>{{ key }}</h3>
             {% for run_id, sample_id in value %}
             <ul>
-                <li><a href="samples/{{ run_id }}/{{ sample_id }}">{{ sample_id }}</a></li>
+                <li><a href="{{ url_for('.specific_sample', run_id=run_id, sample_id=sample_id) }}">{{ sample_id }}</a></li>
             </ul>
             {% endfor %}
         {% endfor %}

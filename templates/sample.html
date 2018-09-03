@@ -1,17 +1,23 @@
 {% extends "index.html" %}
 
 {% block content %}
-    <h3><b>Run ID:</b> {{ run_id }}</h3>
+    <h3><b>Run ID:</b> <a href="{{ url_for('.specific_run', run_id=run_id) }}">{{ run_id }}</a></h3>
     <h3><b>Sample ID:</b> {{ sample_id }}</h3>
     {{ coverage_sample_summary|safe }}
 
     <div>
         <h3>Download:</h3>
 
-        {% if fastq_path %}
-        <a class="btn btn-primary" href="{{ fastq_path }}" role="button">FASTQ</a>
+        {% if fastq_path_r1 %}
+        <a class="btn btn-primary" href="{{ fastq_path_r1 }}" role="button">FASTQ R1</a>
         {% else %}
-        <a class="btn btn-secondary disabled" href="{{ fastq_path }}" role="button">FASTQ</a>
+        <a class="btn btn-secondary disabled" href="{{ fastq_path_r1 }}" role="button">FASTQ R1</a>
+        {% endif %}
+
+        {% if fastq_path_r2 %}
+        <a class="btn btn-primary" href="{{ fastq_path_r2 }}" role="button">FASTQ R2</a>
+        {% else %}
+        <a class="btn btn-secondary disabled" href="{{ fastq_path_r2 }}" role="button">FASTQ R2</a>
         {% endif %}
 
         {% if bam_path %}
@@ -24,6 +30,36 @@
         <a class="btn btn-primary" href="{{ vcf_path }}" role="button">VCF</a>
         {% else %}
         <a class="btn btn-secondary disabled" href="{{ vcf_path }}" role="button">VCF</a>
+        {% endif %}
+    </div>
+
+    <div>
+        <h3>Reports:</h3>
+
+        <h5>Trimmed</h5>
+        {% if fq1_fastqc %}
+        <a class="btn btn-primary" href="{{ fq1_fastqc }}" role="button">FASTQ FQ1</a>
+        {% else %}
+        <a class="btn btn-secondary disabled" href="{{ fq1_fastqc }}" role="button">FASTQ FQ1</a>
+        {% endif %}
+
+        {% if fq2_fastqc %}
+        <a class="btn btn-primary" href="{{ fq2_fastqc }}" role="button">FASTQ FQ2</a>
+        {% else %}
+        <a class="btn btn-secondary disabled" href="{{ fq2_fastqc }}" role="button">FASTQ FQ2</a>
+        {% endif %}
+
+        <h5>Raw</h5>
+        {% if R1_001_fastqc %}
+        <a class="btn btn-primary" href="{{ R1_001_fastqc }}" role="button">FASTQ R1</a>
+        {% else %}
+        <a class="btn btn-secondary disabled" href="{{ R1_001_fastqc }}" role="button">FASTQ R1</a>
+        {% endif %}
+
+        {% if R2_001_fastqc %}
+        <a class="btn btn-primary" href="{{ R2_001_fastqc }}" role="button">FASTQ R2</a>
+        {% else %}
+        <a class="btn btn-secondary disabled" href="{{ R2_001_fastqc }}" role="button">FASTQ R2</a>
         {% endif %}
     </div>
 
