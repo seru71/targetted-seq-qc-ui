@@ -24,9 +24,7 @@ def runs():
     return render_template('runs.html', runs=runs)
 
 
-@server.route("/samples")
-def samples():
-    runs = os.listdir(DATA_FOLDER)
+def samples_paths(runs):
     samples = {}
 
     def valid_sample(sample_name):
@@ -39,12 +37,25 @@ def samples():
         run_path = os.path.join(DATA_FOLDER, run_id)
         samples[run_id] = ([(run_id, sample_id) for sample_id in os.listdir(run_path) if valid_sample(sample_id)])
 
+    return samples
+
+
+@server.route("/samples")
+def samples():
+    runs = os.listdir(DATA_FOLDER)
+    samples = samples_paths(runs)
+
     return render_template('samples.html', samples=samples)
 
 
 @server.route("/runs/<run_id>/<sample_id>", methods=['GET', 'POST'])
 def specific_sample(run_id, sample_id):
-    data = {'run_id': run_id, 'sample_id': sample_id, 'fastq_path': None, 'bam_path': None, 'vcf_path': None}
+    data = {'run_id': run_id,
+            'sample_id': sample_id,
+            'fastq_path': None,
+            'bam_path': None,
+            'vcf_path': None,
+            'samples': samples_paths(os.listdir(DATA_FOLDER))}
 
     sample_path = os.path.join(DATA_FOLDER, run_id, sample_id)
     run_path = os.path.join(DATA_FOLDER, run_id)
@@ -119,6 +130,8 @@ def specific_run(run_id):
     sample_summary_table = data_preparation.get_summary(run_id)
     mean_cols_df = data_preparation.get_gene_summary(run_id)
 
+    runs = os.listdir(DATA_FOLDER)
+
     # presenting plot
     img_path = '/'.join(f"{os.path.join(DATA_FOLDER,run_id, f'{run_id}.png')}".split(os.sep)[1:])
     plot_path = f"{os.path.join(DATA_FOLDER,run_id, f'{run_id}.png')}"
@@ -138,7 +151,8 @@ def specific_run(run_id):
     data = {'run_id': run_id,
             'sample_summary_table': table,
             'unique_genes': unique_genes,
-            'plot_path': img_path}
+            'plot_path': img_path,
+            'runs': runs}
 
     if request.method == 'POST' and request.form.get('gene_names'):
         try:
