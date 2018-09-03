@@ -24,9 +24,7 @@ def runs():
     return render_template('runs.html', runs=runs)
 
 
-@server.route("/samples")
-def samples():
-    runs = os.listdir(DATA_FOLDER)
+def samples_paths(runs):
     samples = {}
 
     def valid_sample(sample_name):
@@ -39,12 +37,25 @@ def samples():
         run_path = os.path.join(DATA_FOLDER, run_id)
         samples[run_id] = ([(run_id, sample_id) for sample_id in os.listdir(run_path) if valid_sample(sample_id)])
 
+    return samples
+
+
+@server.route("/samples")
+def samples():
+    runs = os.listdir(DATA_FOLDER)
+    samples = samples_paths(runs)
+
     return render_template('samples.html', samples=samples)
 
 
 @server.route("/runs/<run_id>/<sample_id>", methods=['GET', 'POST'])
 def specific_sample(run_id, sample_id):
-    data = {'run_id': run_id, 'sample_id': sample_id, 'fastq_path': None, 'bam_path': None, 'vcf_path': None}
+    data = {'run_id': run_id,
+            'sample_id': sample_id,
+            'fastq_path': None,
+            'bam_path': None,
+            'vcf_path': None,
+            'samples': samples_paths(os.listdir(DATA_FOLDER))}
 
     sample_path = os.path.join(DATA_FOLDER, run_id, sample_id)
     run_path = os.path.join(DATA_FOLDER, run_id)
