@@ -77,14 +77,15 @@ def specific_sample(run_id, sample_id):
     data['fq2_fastqc'] = '../../' + fq2_fastqc.replace(os.sep, '/') if os.path.isfile(fq2_fastqc) else False
 
     try:
-        r1_filename = glob.glob(reports_path + '/{}*R1_001_fastqc.html'.format(sample_id))[0].split('\\')[-1]
+        r1_filename = glob.glob(reports_path + '/{}*R1_001_fastqc.html'.format(sample_id))[0].split(os.sep)[-1]
         r1_001_fastqc = os.path.join(reports_path, r1_filename)
         data['R1_001_fastqc'] = '../../' + r1_001_fastqc.replace(os.sep, '/')
+        print(r1_filename)
     except IndexError:
         data['R1_001_fastqc'] = False
 
     try:
-        r2_filename = glob.glob(reports_path + '/{}*R2_001_fastqc.html'.format(sample_id))[0].split('\\')[-1]
+        r2_filename = glob.glob(reports_path + '/{}*R2_001_fastqc.html'.format(sample_id))[0].split(os.sep)[-1]
         r2_001_fastqc = os.path.join(reports_path, r2_filename)
         data['R2_001_fastqc'] = '../../' + r2_001_fastqc.replace(os.sep, '/')
     except IndexError:
