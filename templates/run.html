@@ -29,3 +29,13 @@
 
     <h3>Variants</h3>
 {% endblock %}
+
+
+{% block left_menu %}
+    <h2>Runs available:</h2>
+    <ul>
+        {% for run in runs %}
+        <li><a href="{{ url_for('.specific_run', run_id=run) }}">{{ run }}</a></li>
+        {% endfor %}
+    </ul>
+{% endblock %}
