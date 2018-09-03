@@ -4,6 +4,9 @@ import pandas as pd
 
 import data_preparation
 
+import matplotlib
+matplotlib.use('Agg')
+
 from flask import Flask, render_template, request
 
 DATA_FOLDER = os.path.join(*['static', 'test-data', 'results-archive'])
