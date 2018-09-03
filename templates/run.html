@@ -6,8 +6,7 @@
 
 
     <h3>Graphical representation:</h3>
-    <img src="{{ plot_path }}">
-
+    <img src="{{ url_for('static', filename=plot_path) }}">
     <h3>Gene coverage</h3>
     <p>Please enter gene names separated by the comma (for example "OR4F16, TTLL10").</p>
     <form method="POST", name="genes">
