@@ -36,6 +36,7 @@
     <div>
         <h3>Reports:</h3>
 
+        <h5>Trimmed</h5>
         {% if fq1_fastqc %}
         <a class="btn btn-primary" href="{{ fq1_fastqc }}" role="button">FASTQ FQ1</a>
         {% else %}
@@ -48,6 +49,7 @@
         <a class="btn btn-secondary disabled" href="{{ fq2_fastqc }}" role="button">FASTQ FQ2</a>
         {% endif %}
 
+        <h5>Raw</h5>
         {% if R1_001_fastqc %}
         <a class="btn btn-primary" href="{{ R1_001_fastqc }}" role="button">FASTQ R1</a>
         {% else %}

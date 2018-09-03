@@ -80,7 +80,6 @@ def specific_sample(run_id, sample_id):
         r1_filename = glob.glob(reports_path + '/{}*R1_001_fastqc.html'.format(sample_id))[0].split(os.sep)[-1]
         r1_001_fastqc = os.path.join(reports_path, r1_filename)
         data['R1_001_fastqc'] = '../../' + r1_001_fastqc.replace(os.sep, '/')
-        print(r1_filename)
     except IndexError:
         data['R1_001_fastqc'] = False
 
