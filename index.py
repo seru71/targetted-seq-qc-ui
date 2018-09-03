@@ -76,13 +76,19 @@ def specific_sample(run_id, sample_id):
     fq2_fastqc = os.path.join(reports_path, '{}.fq2_fastqc.html'.format(sample_id))
     data['fq2_fastqc'] = '../../' + fq2_fastqc.replace(os.sep, '/') if os.path.isfile(fq2_fastqc) else False
 
-    r1_filename = glob.glob(reports_path + '/{}*R1_001_fastqc.html'.format(sample_id))[0].split('\\')[-1]
-    R1_001_fastqc = os.path.join(reports_path, r1_filename)
-    data['R1_001_fastqc'] = '../../' + R1_001_fastqc.replace(os.sep, '/') if os.path.isfile(R1_001_fastqc) else False
+    try:
+        r1_filename = glob.glob(reports_path + '/{}*R1_001_fastqc.html'.format(sample_id))[0].split('\\')[-1]
+        r1_001_fastqc = os.path.join(reports_path, r1_filename)
+        data['R1_001_fastqc'] = '../../' + r1_001_fastqc.replace(os.sep, '/')
+    except IndexError:
+        data['R1_001_fastqc'] = False
 
-    r2_filename = glob.glob(reports_path + '/{}*R2_001_fastqc.html'.format(sample_id))[0].split('\\')[-1]
-    R2_001_fastqc = os.path.join(reports_path, r2_filename)
-    data['R2_001_fastqc'] = '../../' + R2_001_fastqc.replace(os.sep, '/') if os.path.isfile(R2_001_fastqc) else False
+    try:
+        r2_filename = glob.glob(reports_path + '/{}*R2_001_fastqc.html'.format(sample_id))[0].split('\\')[-1]
+        r2_001_fastqc = os.path.join(reports_path, r2_filename)
+        data['R2_001_fastqc'] = '../../' + r2_001_fastqc.replace(os.sep, '/')
+    except IndexError:
+        data['R2_001_fastqc'] = False
 
     coverage_sample_summary = pd.read_csv(coverage_sample_summary_path, delimiter='\t', index_col=False).dropna()
     coverage_sample_gene_summary = pd.read_csv(coverage_sample_gene_summary_path, delimiter='\t', index_col=False)
