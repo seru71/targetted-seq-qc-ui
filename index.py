@@ -42,7 +42,7 @@ def samples():
     return render_template('samples.html', samples=samples)
 
 
-@server.route("/<run_id>/<sample_id>", methods=['GET', 'POST'])
+@server.route("/runs/<run_id>/<sample_id>", methods=['GET', 'POST'])
 def specific_sample(run_id, sample_id):
     data = {'run_id': run_id, 'sample_id': sample_id, 'fastq_path': None, 'bam_path': None, 'vcf_path': None}
 
@@ -114,12 +114,13 @@ def specific_sample(run_id, sample_id):
     return render_template('sample.html', **data)
 
 
-@server.route("/<run_id>", methods=['GET', 'POST'])
+@server.route("/runs/<run_id>", methods=['GET', 'POST'])
 def specific_run(run_id):
     sample_summary_table = data_preparation.get_summary(run_id)
     mean_cols_df = data_preparation.get_gene_summary(run_id)
 
     # presenting plot
+    img_path = '/'.join(f"{os.path.join(DATA_FOLDER,run_id, f'{run_id}.png')}".split(os.sep)[1:])
     plot_path = f"{os.path.join(DATA_FOLDER,run_id, f'{run_id}.png')}"
     if not os.path.isfile(plot_path):
         plot = sample_summary_table[['Sample ID', 'Mean']].plot(kind='bar', x=sample_summary_table['Sample ID'], grid=True)
@@ -136,7 +137,7 @@ def specific_run(run_id):
     data = {'run_id': run_id,
             'sample_summary_table': table,
             'unique_genes': unique_genes,
-            'plot_path': plot_path}
+            'plot_path': img_path}
 
     if request.method == 'POST' and request.form.get('gene_names'):
         try:
