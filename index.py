@@ -1,4 +1,5 @@
 import os
+import glob
 import pandas as pd
 
 import data_preparation
@@ -8,6 +9,7 @@ from flask import Flask, render_template, request
 DATA_FOLDER = os.path.join(*['static', 'test-data', 'results-archive'])
 DATA_SUMMARY_FOLDER = 'qc'
 FASTQ = 'fastqs'
+READ_QC = 'read_qc'
 
 server = Flask(__name__)
 
@@ -50,6 +52,7 @@ def specific_sample(run_id, sample_id):
     coverage_sample_summary_path = (os.path.join(sample_path, '{}.coverage.sample_summary'.format(sample_id)))
     coverage_sample_gene_summary_path = (os.path.join(sample_path, '{}.coverage.sample_gene_summary').format(sample_id))
 
+    # download files
     fastq_path_r1 = os.path.join(run_path, FASTQ, '{}_S1_R1_001.fastq.gz'.format(sample_id))
     fastq_path_r2 = os.path.join(run_path, FASTQ, '{}_S1_R2_001.fastq.gz'.format(sample_id))
 
@@ -63,6 +66,23 @@ def specific_sample(run_id, sample_id):
     vcf_path = '{}/{}.vcf'.format(sample_path.replace(os.sep, '/'), sample_id)
     vcf_file_exists = os.path.isfile(vcf_path.replace('/', os.sep))
     data['vcf_path'] = '../../' + vcf_path if vcf_file_exists else False
+
+    # reports
+    reports_path = os.path.join(DATA_FOLDER, run_id, DATA_SUMMARY_FOLDER, READ_QC)
+
+    fq1_fastqc = os.path.join(reports_path, '{}.fq1_fastqc.html'.format(sample_id))
+    data['fq1_fastqc'] = '../../' + fq1_fastqc.replace(os.sep, '/') if os.path.isfile(fq1_fastqc) else False
+
+    fq2_fastqc = os.path.join(reports_path, '{}.fq2_fastqc.html'.format(sample_id))
+    data['fq2_fastqc'] = '../../' + fq2_fastqc.replace(os.sep, '/') if os.path.isfile(fq2_fastqc) else False
+
+    r1_filename = glob.glob(reports_path + '/{}*R1_001_fastqc.html'.format(sample_id))[0].split('\\')[-1]
+    R1_001_fastqc = os.path.join(reports_path, r1_filename)
+    data['R1_001_fastqc'] = '../../' + R1_001_fastqc.replace(os.sep, '/') if os.path.isfile(R1_001_fastqc) else False
+
+    r2_filename = glob.glob(reports_path + '/{}*R2_001_fastqc.html'.format(sample_id))[0].split('\\')[-1]
+    R2_001_fastqc = os.path.join(reports_path, r2_filename)
+    data['R2_001_fastqc'] = '../../' + R2_001_fastqc.replace(os.sep, '/') if os.path.isfile(R2_001_fastqc) else False
 
     coverage_sample_summary = pd.read_csv(coverage_sample_summary_path, delimiter='\t', index_col=False).dropna()
     coverage_sample_gene_summary = pd.read_csv(coverage_sample_gene_summary_path, delimiter='\t', index_col=False)
