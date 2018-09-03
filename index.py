@@ -15,10 +15,6 @@ server = Flask(__name__)
 
 
 @server.route("/")
-def index():
-    return render_template('index.html')
-
-
 @server.route("/runs")
 def runs():
     runs = os.listdir(DATA_FOLDER)
@@ -43,7 +39,7 @@ def samples():
     return render_template('samples.html', samples=samples)
 
 
-@server.route("/samples/<run_id>/<sample_id>", methods=['GET', 'POST'])
+@server.route("/<run_id>/<sample_id>", methods=['GET', 'POST'])
 def specific_sample(run_id, sample_id):
     data = {'run_id': run_id, 'sample_id': sample_id, 'fastq_path': None, 'bam_path': None, 'vcf_path': None}
 
@@ -93,7 +89,7 @@ def specific_sample(run_id, sample_id):
     coverage_sample_summary = pd.read_csv(coverage_sample_summary_path, delimiter='\t', index_col=False).dropna()
     coverage_sample_gene_summary = pd.read_csv(coverage_sample_gene_summary_path, delimiter='\t', index_col=False)
 
-    data['coverage_sample_summary'] = coverage_sample_summary.to_html(classes='table table-sm table-hover')
+    data['coverage_sample_summary'] = coverage_sample_summary.to_html(classes='table table-sm table-hover', index=False)
 
     if request.method == 'POST' and request.form.get('gene_names'):
         try:
@@ -106,7 +102,8 @@ def specific_sample(run_id, sample_id):
 
             df = data_preparation.prepare_mean_columns_df(df)
 
-            data['coverage_sample_gene_summary'] = df.to_html(classes='table table-sm table-hover')
+            with pd.option_context('display.max_colwidth', -1):
+                data['coverage_sample_gene_summary'] = df.to_html(classes='table table-sm table-hover', index=False)
         except Exception as e:
             print(e)
             pass
@@ -114,15 +111,20 @@ def specific_sample(run_id, sample_id):
     return render_template('sample.html', **data)
 
 
-@server.route("/runs/<run_id>", methods=['GET', 'POST'])
+@server.route("/<run_id>", methods=['GET', 'POST'])
 def specific_run(run_id):
     sample_summary_table = data_preparation.get_summary(run_id)
     mean_cols_df = data_preparation.get_gene_summary(run_id)
 
     unique_genes = set([x.split('_')[0] for x in mean_cols_df.Gene])
 
+    with pd.option_context('display.max_colwidth', -1):
+        table = sample_summary_table.to_html(classes='table table-sm table-hover', escape=False, index=False)
+
+    print(table)
+
     data = {'run_id': run_id,
-            'sample_summary_table': sample_summary_table.to_html(classes='table table-sm table-hover'),
+            'sample_summary_table': table,
             'unique_genes': unique_genes}
 
     if request.method == 'POST' and request.form.get('gene_names'):
@@ -134,7 +136,7 @@ def specific_run(run_id):
 
             df.drop(columns=['gene_name'], inplace=True)
             df = data_preparation.prepare_mean_columns_df(df)
-            data['selected_genes_df'] = df.to_html(classes='table table-sm table-hover')
+            data['selected_genes_df'] = df.to_html(classes='table table-sm table-hover', index=False)
         except Exception as e:
             print(e)
             pass
