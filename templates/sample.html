@@ -33,6 +33,34 @@
         {% endif %}
     </div>
 
+    <div>
+        <h3>Reports:</h3>
+
+        {% if fq1_fastqc %}
+        <a class="btn btn-primary" href="{{ fq1_fastqc }}" role="button">FASTQ FQ1</a>
+        {% else %}
+        <a class="btn btn-secondary disabled" href="{{ fq1_fastqc }}" role="button">FASTQ FQ1</a>
+        {% endif %}
+
+        {% if fq2_fastqc %}
+        <a class="btn btn-primary" href="{{ fq2_fastqc }}" role="button">FASTQ FQ2</a>
+        {% else %}
+        <a class="btn btn-secondary disabled" href="{{ fq2_fastqc }}" role="button">FASTQ FQ2</a>
+        {% endif %}
+
+        {% if R1_001_fastqc %}
+        <a class="btn btn-primary" href="{{ R1_001_fastqc }}" role="button">FASTQ R1</a>
+        {% else %}
+        <a class="btn btn-secondary disabled" href="{{ R1_001_fastqc }}" role="button">FASTQ R1</a>
+        {% endif %}
+
+        {% if R2_001_fastqc %}
+        <a class="btn btn-primary" href="{{ R2_001_fastqc }}" role="button">FASTQ R2</a>
+        {% else %}
+        <a class="btn btn-secondary disabled" href="{{ R2_001_fastqc }}" role="button">FASTQ R2</a>
+        {% endif %}
+    </div>
+
     <h3>Gene coverage:</h3>
 
     <p>Please enter gene names separated by the comma (for example "OR4F16, TTLL10").</p>
