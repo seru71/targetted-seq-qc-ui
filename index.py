@@ -7,6 +7,7 @@ from flask import Flask, render_template, request
 
 DATA_FOLDER = os.path.join(*['static', 'test-data', 'results-archive'])
 DATA_SUMMARY_FOLDER = 'qc'
+FASTQ = 'fastqs'
 
 server = Flask(__name__)
 
@@ -45,10 +46,19 @@ def specific_sample(run_id, sample_id):
     data = {'run_id': run_id, 'sample_id': sample_id, 'fastq_path': None, 'bam_path': None, 'vcf_path': None}
 
     sample_path = os.path.join(DATA_FOLDER, run_id, sample_id)
+    run_path = os.path.join(DATA_FOLDER, run_id)
     coverage_sample_summary_path = (os.path.join(sample_path, '{}.coverage.sample_summary'.format(sample_id)))
     coverage_sample_gene_summary_path = (os.path.join(sample_path, '{}.coverage.sample_gene_summary').format(sample_id))
 
-    data['fastq_path'] = None
+    # static/test-data/results-archive/171026_NB551023_0033_AHMFG5AFXX/fastqs/7421_S1_R1_001.fastq.gz
+    fastq_path_r1 = os.path.join(run_path, FASTQ, '{}_S1_R1_001.fastq.gz'.format(sample_id))
+    fastq_path_r2 = os.path.join(run_path, FASTQ, '{}_S1_R2_001.fastq.gz'.format(sample_id))
+
+    print(fastq_path_r1.replace(os.sep, '/'))
+    print('static/test-data/results-archive/171026_NB551023_0033_AHMFG5AFXX/fastqs/7421_S1_R1_001.fastq.gz')
+
+    data['fastq_path_r1'] = '../../' + fastq_path_r1.replace(os.sep, '/') if os.path.isfile(fastq_path_r1.replace(os.sep, '/')) else False
+    data['fastq_path_r2'] = '../../' + fastq_path_r2.replace(os.sep, '/') if os.path.isfile(fastq_path_r2) else False
 
     bam_path = '{}/{}.dedup.bam'.format(sample_path.replace(os.sep, '/'), sample_id)
     bam_file_exists = os.path.isfile(bam_path.replace('/', os.sep))

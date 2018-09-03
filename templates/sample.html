@@ -8,10 +8,16 @@
     <div>
         <h3>Download:</h3>
 
-        {% if fastq_path %}
-        <a class="btn btn-primary" href="{{ fastq_path }}" role="button">FASTQ</a>
+        {% if fastq_path_r1 %}
+        <a class="btn btn-primary" href="{{ fastq_path_r1 }}" role="button">FASTQ R1</a>
         {% else %}
-        <a class="btn btn-secondary disabled" href="{{ fastq_path }}" role="button">FASTQ</a>
+        <a class="btn btn-secondary disabled" href="{{ fastq_path_r1 }}" role="button">FASTQ R1</a>
+        {% endif %}
+
+        {% if fastq_path_r2 %}
+        <a class="btn btn-primary" href="{{ fastq_path_r2 }}" role="button">FASTQ R2</a>
+        {% else %}
+        <a class="btn btn-secondary disabled" href="{{ fastq_path_r2 }}" role="button">FASTQ R2</a>
         {% endif %}
 
         {% if bam_path %}
