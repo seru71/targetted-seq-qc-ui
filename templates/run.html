@@ -1,7 +1,7 @@
 {% extends "index.html" %}
 
 {% block content %}
-    <h3><b>Run ID:</b> {{ run_id }}</h3>
+<h3><b>Run ID:</b> {{ run_id }}</h3>
     {{ sample_summary_table|safe }}
 
 
@@ -9,16 +9,16 @@
     <img src="{{ url_for('static', filename=plot_path) }}">
     <h3>Gene coverage</h3>
     <p>Please enter gene names separated by the comma (for example "OR4F16, TTLL10").</p>
-    <form method="POST", name="genes">
+    <form method="POST" , name="genes">
         <input name="gene_names">
         <input type="submit">
     </form>
 
     {% if genes %}
         <p><b>Genes selected: </b>
-        {% for gene in genes %}
+            {% for gene in genes %}
             '{{ gene }}'
-        {% endfor %}
+            {% endfor %}
         </p>
 
         {% if selected_genes_df %}
@@ -28,4 +28,14 @@
 
 
     <h3>Variants</h3>
+{% endblock %}
+
+
+{% block left_menu %}
+    <h3><b>Runs available:</b></h3>
+    <ul>
+        {% for run in runs %}
+        <li><a href="{{ url_for('.specific_run', run_id=run) }}">{{ run }}</a></li>
+        {% endfor %}
+    </ul>
 {% endblock %}
