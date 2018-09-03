@@ -50,12 +50,8 @@ def specific_sample(run_id, sample_id):
     coverage_sample_summary_path = (os.path.join(sample_path, '{}.coverage.sample_summary'.format(sample_id)))
     coverage_sample_gene_summary_path = (os.path.join(sample_path, '{}.coverage.sample_gene_summary').format(sample_id))
 
-    # static/test-data/results-archive/171026_NB551023_0033_AHMFG5AFXX/fastqs/7421_S1_R1_001.fastq.gz
     fastq_path_r1 = os.path.join(run_path, FASTQ, '{}_S1_R1_001.fastq.gz'.format(sample_id))
     fastq_path_r2 = os.path.join(run_path, FASTQ, '{}_S1_R2_001.fastq.gz'.format(sample_id))
-
-    print(fastq_path_r1.replace(os.sep, '/'))
-    print('static/test-data/results-archive/171026_NB551023_0033_AHMFG5AFXX/fastqs/7421_S1_R1_001.fastq.gz')
 
     data['fastq_path_r1'] = '../../' + fastq_path_r1.replace(os.sep, '/') if os.path.isfile(fastq_path_r1.replace(os.sep, '/')) else False
     data['fastq_path_r2'] = '../../' + fastq_path_r2.replace(os.sep, '/') if os.path.isfile(fastq_path_r2) else False
