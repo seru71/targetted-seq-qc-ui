@@ -2,9 +2,6 @@ import os
 import glob
 import pandas as pd
 
-import matplotlib
-matplotlib.use("Agg")
-
 import data_preparation
 
 from flask import Flask, render_template, request
@@ -123,7 +120,8 @@ def specific_run(run_id):
     img_path = '/'.join(f"{os.path.join(DATA_FOLDER,run_id, f'{run_id}.png')}".split(os.sep)[1:])
     plot_path = f"{os.path.join(DATA_FOLDER,run_id, f'{run_id}.png')}"
     if not os.path.isfile(plot_path):
-        plot = sample_summary_table[['Sample ID', 'Mean']].plot(kind='bar', x=sample_summary_table['Sample ID'], grid=True)
+        print(sample_summary_table['Sample ID'])
+        plot = sample_summary_table[['Sample ID', 'Mean']].plot(kind='bar', x='Sample ID', grid=True)
         fig = plot.get_figure()
         fig.savefig(plot_path)
 
