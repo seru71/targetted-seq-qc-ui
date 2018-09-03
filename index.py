@@ -131,7 +131,7 @@ def specific_run(run_id):
 
     with pd.option_context('display.max_colwidth', -1):
         sample_summary_table['Sample ID'] = sample_summary_table['Sample ID'].apply(
-            lambda x: '<a href=\"/{run_id}/{sample_id}">{sample_id}</a>'.format(sample_id=x, run_id=run_id))
+            lambda x: '<a href=\"/runs/{run_id}/{sample_id}">{sample_id}</a>'.format(sample_id=x, run_id=run_id))
         table = sample_summary_table.to_html(classes='table table-sm table-hover', escape=False, index=False)
 
     data = {'run_id': run_id,
