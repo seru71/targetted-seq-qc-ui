@@ -24,6 +24,51 @@ def runs():
     return render_template('runs.html', runs=runs)
 
 
+@server.route("/runs/<run_id>", methods=['GET', 'POST'])
+def specific_run(run_id):
+    sample_summary_table = data_preparation.get_summary(run_id)
+    mean_cols_df = data_preparation.get_gene_summary(run_id)
+
+    runs = os.listdir(DATA_FOLDER)
+
+    # presenting plot
+    img_path = '/'.join(f"{os.path.join(DATA_FOLDER,run_id, f'{run_id}.png')}".split(os.sep)[1:])
+    plot_path = f"{os.path.join(DATA_FOLDER,run_id, f'{run_id}.png')}"
+    if not os.path.isfile(plot_path):
+        plot = sample_summary_table[['Sample ID', 'Mean', 'Above 20%']].plot(kind='bar', x='Sample ID', grid=True)
+        fig = plot.get_figure()
+        fig.savefig(plot_path)
+
+    unique_genes = set([x.split('_')[0] for x in mean_cols_df.Gene])
+
+    with pd.option_context('display.max_colwidth', -1):
+        sample_summary_table['Sample ID'] = sample_summary_table['Sample ID'].apply(
+            lambda x: '<a href=\"/runs/{run_id}/{sample_id}">{sample_id}</a>'.format(sample_id=x, run_id=run_id))
+        table = sample_summary_table.to_html(classes='table table-sm table-hover', escape=False, index=False)
+
+    data = {'run_id': run_id,
+            'sample_summary_table': table,
+            'unique_genes': unique_genes,
+            'plot_path': img_path,
+            'runs': runs}
+
+    if request.method == 'POST' and request.form.get('gene_names'):
+        try:
+            data['genes'] = [x.strip() for x in request.form.get('gene_names').split(',')]
+
+            mean_cols_df['gene_name'] = mean_cols_df.Gene.apply(lambda x: x.split('_')[0])
+            df = mean_cols_df.loc[mean_cols_df['gene_name'].isin(data['genes'])]
+
+            df.drop(columns=['gene_name'], inplace=True)
+            df = data_preparation.prepare_mean_columns_df(df)
+            data['selected_genes_df'] = df.to_html(classes='table table-sm table-hover', index=False)
+        except Exception as e:
+            print(e)
+            pass
+
+    return render_template('run.html', **data)
+
+
 def samples_paths(runs):
     samples = {}
 
@@ -123,52 +168,6 @@ def specific_sample(run_id, sample_id):
             pass
 
     return render_template('sample.html', **data)
-
-
-@server.route("/runs/<run_id>", methods=['GET', 'POST'])
-def specific_run(run_id):
-    sample_summary_table = data_preparation.get_summary(run_id)
-    mean_cols_df = data_preparation.get_gene_summary(run_id)
-
-    runs = os.listdir(DATA_FOLDER)
-
-    # presenting plot
-    img_path = '/'.join(f"{os.path.join(DATA_FOLDER,run_id, f'{run_id}.png')}".split(os.sep)[1:])
-    plot_path = f"{os.path.join(DATA_FOLDER,run_id, f'{run_id}.png')}"
-    if not os.path.isfile(plot_path):
-        print(sample_summary_table['Sample ID'])
-        plot = sample_summary_table[['Sample ID', 'Mean']].plot(kind='bar', x='Sample ID', grid=True)
-        fig = plot.get_figure()
-        fig.savefig(plot_path)
-
-    unique_genes = set([x.split('_')[0] for x in mean_cols_df.Gene])
-
-    with pd.option_context('display.max_colwidth', -1):
-        sample_summary_table['Sample ID'] = sample_summary_table['Sample ID'].apply(
-            lambda x: '<a href=\"/runs/{run_id}/{sample_id}">{sample_id}</a>'.format(sample_id=x, run_id=run_id))
-        table = sample_summary_table.to_html(classes='table table-sm table-hover', escape=False, index=False)
-
-    data = {'run_id': run_id,
-            'sample_summary_table': table,
-            'unique_genes': unique_genes,
-            'plot_path': img_path,
-            'runs': runs}
-
-    if request.method == 'POST' and request.form.get('gene_names'):
-        try:
-            data['genes'] = [x.strip() for x in request.form.get('gene_names').split(',')]
-
-            mean_cols_df['gene_name'] = mean_cols_df.Gene.apply(lambda x: x.split('_')[0])
-            df = mean_cols_df.loc[mean_cols_df['gene_name'].isin(data['genes'])]
-
-            df.drop(columns=['gene_name'], inplace=True)
-            df = data_preparation.prepare_mean_columns_df(df)
-            data['selected_genes_df'] = df.to_html(classes='table table-sm table-hover', index=False)
-        except Exception as e:
-            print(e)
-            pass
-
-    return render_template('run.html', **data)
 
 
 if __name__ == '__main__':
