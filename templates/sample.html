@@ -5,8 +5,9 @@
     <h3><b>Sample ID:</b> {{ sample_id }}</h3>
     {{ coverage_sample_summary|safe }}
 
+    <div class="row">
+        <div class="col">
     <h3>Download:</h3>
-    <div>
         {% if fastq_path_r1 %}
         <a class="btn btn-primary" href="{{ fastq_path_r1 }}" role="button">FASTQ R1</a>
         {% else %}
@@ -31,8 +32,7 @@
         <a class="btn btn-secondary disabled" href="{{ vcf_path }}" role="button">VCF</a>
         {% endif %}
     </div>
-
-    <div>
+        <div class="col">
         <h3>Reports:</h3>
 
         <h5>Trimmed</h5>
@@ -61,14 +61,16 @@
         <a class="btn btn-secondary disabled" href="{{ R2_001_fastqc }}" role="button">FASTQ R2</a>
         {% endif %}
     </div>
+        <div class="col">
+            <h3>Gene coverage:</h3>
 
-    <h3>Gene coverage:</h3>
-
-    <p>Please enter gene names separated by the comma (for example "OR4F16, TTLL10").</p>
-    <form method="POST", name="genes">
-        <input name="gene_names">
-        <input type="submit">
-    </form>
+            <p>Please enter gene names separated by the comma (for example "OR4F16, TTLL10").</p>
+            <form method="POST", name="genes">
+                <input name="gene_names">
+                <input type="submit">
+            </form>
+        </div>
+    </div>
 
     {% if genes %}
         <p><b>Genes selected: </b>
