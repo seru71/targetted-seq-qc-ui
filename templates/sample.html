@@ -85,32 +85,19 @@
 
 
 {% block left_menu %}
-    <h3><b>Samples available:</b></h3>
-    {% for key, value in samples.items() %}
-        <div class="accordion">
-            <div class="card">
-                <div class="card-header" id="headingOne">
-                    <h5 class="mb-0">
-                        <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#a{{ key }}"
-                                aria-expanded="true" aria-controls="a{{ key }}">
-                            <!--<a href="{{ url_for('.specific_run', run_id=key) }}">{{ key }}</a>-->
-                            {{ key }}
-                        </button>
-                    </h5>
-                </div>
+    <!--presentation of current run collapsed in left menu-->
+    <h3><b>Selected run samples:</b></h3>
+    {% with value=samples[run_id], run_id=run_id %}
+        {% include '_card_collapsed.html' %}
+    {% endwith %}
 
-                <div id="a{{ key }}" class="collapse" aria-labelledby="headingOne">
-                    <div class="card-body">
-                        <ul>
-                            {% for run_id, sample_id in value %}
-                            <li>
-                                <a href="{{ url_for('.specific_sample', run_id=run_id, sample_id=sample_id) }}">{{ sample_id }}</a>
-                            </li>
-                            {% endfor %}
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <!--presentation of every run but currently viewing one-->
+    <h3><b>Samples available:</b></h3>
+    <div class="accordion">
+    {% for key, value in samples.items() %}
+        {% if not key==run_id %}
+            {% include '_card.html' %}
+        {% endif %}
     {% endfor %}
+    </div>
 {% endblock %}
