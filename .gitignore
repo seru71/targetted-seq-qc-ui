@@ -236,6 +236,6 @@ $RECYCLE.BIN/
 data/
 
 # Images
-static/*.png
+static/**/*.png
 
 # End of https://www.gitignore.io/api/linux,python,windows,pycharm+all,jupyternotebook
