@@ -2,6 +2,11 @@ import os
 import glob
 import pandas as pd
 
+import json
+import plotly
+import plotly.plotly as py
+import plotly.graph_objs as go
+
 import data_preparation
 
 import matplotlib
@@ -32,12 +37,21 @@ def specific_run(run_id):
     runs = os.listdir(DATA_FOLDER)
 
     # presenting plot
-    img_path = '/'.join(f"{os.path.join(DATA_FOLDER,run_id, f'{run_id}.png')}".split(os.sep)[1:])
-    plot_path = f"{os.path.join(DATA_FOLDER,run_id, f'{run_id}.png')}"
-    if not os.path.isfile(plot_path):
-        plot = sample_summary_table[['Sample ID', 'Mean', 'Above 20%']].plot(kind='bar', x='Sample ID', grid=True)
-        fig = plot.get_figure()
-        fig.savefig(plot_path)
+    x_label = ['Sample ' + x for x in sample_summary_table['Sample ID'].astype('str')]
+
+    trace0 = go.Bar(
+        x= x_label,
+        y=sample_summary_table['Mean'],
+        name='Mean'
+    )
+    trace1 = go.Bar(
+        x=x_label,
+        y=sample_summary_table['Above 20%'],
+        name='Above 20%',
+    )
+
+    data = [trace0, trace1]
+    graphJSON = json.dumps(data, cls=plotly.utils.PlotlyJSONEncoder)
 
     unique_genes = set([x.split('_')[0] for x in mean_cols_df.Gene])
 
@@ -49,8 +63,8 @@ def specific_run(run_id):
     data = {'run_id': run_id,
             'sample_summary_table': table,
             'unique_genes': unique_genes,
-            'plot_path': img_path,
-            'runs': runs}
+            'runs': runs,
+            'graphJSON': graphJSON}
 
     if request.method == 'POST' and request.form.get('gene_names'):
         try:
