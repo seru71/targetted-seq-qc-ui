@@ -3,7 +3,7 @@
 {% block content %}
 <h3><b>Run ID:</b> {{ run_id }}</h3>
 <h3>Graphical representation:</h3>
-<img src="{{ url_for('static', filename=plot_path) }}">
+<div id="chart" class="chart"></div>
 <h3>Gene coverage</h3>
 {{ sample_summary_table|safe }}
 
