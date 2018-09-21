@@ -12,7 +12,7 @@ import data_preparation
 import matplotlib
 matplotlib.use('Agg')
 
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, url_for
 
 DATA_FOLDER = os.path.join(*['static', 'test-data', 'results-archive'])
 DATA_SUMMARY_FOLDER = 'qc'
@@ -107,6 +107,39 @@ def samples():
     return render_template('samples.html', samples=samples)
 
 
+def get_coverage_sample_summary_path(run_id, sample_id):
+    sample_path = os.path.join(DATA_FOLDER, run_id, sample_id)
+    return os.path.join(sample_path, '{}.coverage.sample_summary'.format(sample_id))
+
+
+def get_sample_gene_summary_path(run_id, sample_id):
+    sample_path = os.path.join(DATA_FOLDER, run_id, sample_id)
+    return os.path.join(sample_path, '{}.coverage.sample_gene_summary').format(sample_id)
+
+
+def get_fastq_paths(run_id, sample_id):
+    run_path = os.path.join(DATA_FOLDER, run_id)
+    fastq_path_r1 = os.path.join(run_path, FASTQ, '{}_S1_R1_001.fastq.gz'.format(sample_id))
+    fastq_path_r2 = os.path.join(run_path, FASTQ, '{}_S1_R2_001.fastq.gz'.format(sample_id))
+    return fastq_path_r1, fastq_path_r2
+
+
+def get_fastqc_report_path(run_id, sample_id, r):
+    reports_path = os.path.join(DATA_FOLDER, run_id, DATA_SUMMARY_FOLDER, READ_QC)
+    try:
+        r_filename = glob.glob(reports_path + '/{}*R{}_001_fastqc.html'.format(sample_id, r))[0].split(os.sep)[-1]
+        r_001_fastqc = os.path.join(reports_path, r_filename)
+        return '../../' + r_001_fastqc.replace(os.sep, '/')
+    except IndexError:
+        pass
+    return False
+
+
+def get_fq_fastqc_path(run_id, sample_id, fq):
+    reports_path = os.path.join(DATA_FOLDER, run_id, DATA_SUMMARY_FOLDER, READ_QC)
+    return os.path.join(reports_path, '{}.fq{}_fastqc.html'.format(sample_id, fq))
+
+
 @server.route("/runs/<run_id>/<sample_id>", methods=['GET', 'POST'])
 def specific_sample(run_id, sample_id):
     data = {'run_id': run_id,
@@ -116,16 +149,15 @@ def specific_sample(run_id, sample_id):
             'vcf_path': None,
             'samples': samples_paths(os.listdir(DATA_FOLDER))}
 
+    coverage_sample_summary_path = get_coverage_sample_summary_path(run_id, sample_id)
+    coverage_sample_gene_summary_path = get_sample_gene_summary_path(run_id, sample_id)
+
     sample_path = os.path.join(DATA_FOLDER, run_id, sample_id)
-    run_path = os.path.join(DATA_FOLDER, run_id)
-    coverage_sample_summary_path = (os.path.join(sample_path, '{}.coverage.sample_summary'.format(sample_id)))
-    coverage_sample_gene_summary_path = (os.path.join(sample_path, '{}.coverage.sample_gene_summary').format(sample_id))
 
     # download files
-    fastq_path_r1 = os.path.join(run_path, FASTQ, '{}_S1_R1_001.fastq.gz'.format(sample_id))
-    fastq_path_r2 = os.path.join(run_path, FASTQ, '{}_S1_R2_001.fastq.gz'.format(sample_id))
+    fastq_path_r1, fastq_path_r2 = get_fastq_paths(run_id, sample_id)
 
-    data['fastq_path_r1'] = '../../' + fastq_path_r1.replace(os.sep, '/') if os.path.isfile(fastq_path_r1.replace(os.sep, '/')) else False
+    data['fastq_path_r1'] = '../../' + fastq_path_r1.replace(os.sep, '/') if os.path.isfile(fastq_path_r1) else False
     data['fastq_path_r2'] = '../../' + fastq_path_r2.replace(os.sep, '/') if os.path.isfile(fastq_path_r2) else False
 
     bam_path = '{}/{}.dedup.bam'.format(sample_path.replace(os.sep, '/'), sample_id)
@@ -137,27 +169,14 @@ def specific_sample(run_id, sample_id):
     data['vcf_path'] = '../../' + vcf_path if vcf_file_exists else False
 
     # reports
-    reports_path = os.path.join(DATA_FOLDER, run_id, DATA_SUMMARY_FOLDER, READ_QC)
-
-    fq1_fastqc = os.path.join(reports_path, '{}.fq1_fastqc.html'.format(sample_id))
+    fq1_fastqc = get_fq_fastqc_path(run_id, sample_id, 1)
     data['fq1_fastqc'] = '../../' + fq1_fastqc.replace(os.sep, '/') if os.path.isfile(fq1_fastqc) else False
 
-    fq2_fastqc = os.path.join(reports_path, '{}.fq2_fastqc.html'.format(sample_id))
+    fq2_fastqc = get_fq_fastqc_path(run_id, sample_id, 2)
     data['fq2_fastqc'] = '../../' + fq2_fastqc.replace(os.sep, '/') if os.path.isfile(fq2_fastqc) else False
 
-    try:
-        r1_filename = glob.glob(reports_path + '/{}*R1_001_fastqc.html'.format(sample_id))[0].split(os.sep)[-1]
-        r1_001_fastqc = os.path.join(reports_path, r1_filename)
-        data['R1_001_fastqc'] = '../../' + r1_001_fastqc.replace(os.sep, '/')
-    except IndexError:
-        data['R1_001_fastqc'] = False
-
-    try:
-        r2_filename = glob.glob(reports_path + '/{}*R2_001_fastqc.html'.format(sample_id))[0].split(os.sep)[-1]
-        r2_001_fastqc = os.path.join(reports_path, r2_filename)
-        data['R2_001_fastqc'] = '../../' + r2_001_fastqc.replace(os.sep, '/')
-    except IndexError:
-        data['R2_001_fastqc'] = False
+    data['R1_001_fastqc'] = get_fastqc_report_path(run_id, sample_id, 1)
+    data['R2_001_fastqc'] = get_fastqc_report_path(run_id, sample_id, 2)
 
     coverage_sample_summary = pd.read_csv(coverage_sample_summary_path, delimiter='\t', index_col=False).dropna()
     coverage_sample_gene_summary = pd.read_csv(coverage_sample_gene_summary_path, delimiter='\t', index_col=False)
