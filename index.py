@@ -114,9 +114,7 @@ def specific_sample(run_id, sample_id):
     # update dict with links to download files and reports
     data.update(file_paths(run_id, sample_id))
 
-    path = paths_processing.get_system_path(paths_processing.get_coverage_sample_summary_path(run_id, sample_id))
-    coverage_sample_summary = pd.read_csv(path, delimiter='\t', index_col=False).dropna()
-    data['coverage_sample_summary'] = coverage_sample_summary.to_html(classes='table table-sm table-hover', index=False)
+    data['coverage_sample_summary'] = get_coverage_sample_summary_table(run_id, sample_id)
 
     if request.method == 'POST' and request.form.get('gene_names'):
         try:
@@ -139,6 +137,12 @@ def specific_sample(run_id, sample_id):
             pass
 
     return render_template('sample.html', **data)
+
+
+def get_coverage_sample_summary_table(run_id, sample_id):
+    path = paths_processing.get_system_path(paths_processing.get_coverage_sample_summary_path(run_id, sample_id))
+    coverage_sample_summary = pd.read_csv(path, delimiter='\t', index_col=False).dropna()
+    return coverage_sample_summary.to_html(classes='table table-sm table-hover', index=False)
 
 
 def file_paths(run_id, sample_id):
