@@ -37,19 +37,62 @@ def specific_run(run_id):
     # presenting plot
     x_label = ['Sample ' + x for x in sample_summary_table['Sample ID'].astype('str')]
 
-    trace0 = go.Bar(
-        x= x_label,
-        y=sample_summary_table['Mean'],
-        name='Mean'
-    )
-    trace1 = go.Bar(
-        x=x_label,
-        y=sample_summary_table['Above 20%'],
-        name='Above 20%',
-    )
+    # variants
+    variants, variants_df = data_preparation.get_multisample_stats_df(run_id)
 
-    data = [trace0, trace1]
-    graphJSON = json.dumps(data, cls=plotly.utils.PlotlyJSONEncoder)
+    if variants:
+        x_label_variants = ['Sample ' + x for x in variants_df['Sample'].astype('str')]
+
+    graphs = [
+        dict(
+            data=[
+                dict(
+                    go.Bar(
+                        x=x_label,
+                        y=sample_summary_table['Mean'],
+                        name='Mean'
+                    )
+                ),
+                dict(
+                    go.Bar(
+                        x=x_label,
+                        y=sample_summary_table['Above 20%'],
+                        name='Above 20%')
+                )
+            ]
+        ),
+        dict(
+            data=[
+                dict(
+                    go.Bar(
+                        x=x_label_variants,
+                        y=variants_df.nNonRefHom,
+                        name='nNonRefHom',
+                    )
+                ),
+                dict(
+                    go.Bar(
+                        x=x_label_variants,
+                        y=variants_df.nHets,
+                        name='nHets',
+                    )
+                ),
+                dict(
+                    go.Bar(
+                        x=x_label_variants,
+                        y=variants_df.nIndels,
+                        name='nIndels',
+                    )
+                )
+            ],
+            layout=go.Layout(
+                barmode='stack'
+            )
+        )
+    ]
+
+    graphJSON = json.dumps(graphs, cls=plotly.utils.PlotlyJSONEncoder)
+    ids = ['graph-{}'.format(i) for i, _ in enumerate(graphs)]
 
     unique_genes = set([x.split('_')[0] for x in mean_cols_df.Gene])
 
@@ -62,11 +105,9 @@ def specific_run(run_id):
             'sample_summary_table': table,
             'unique_genes': unique_genes,
             'runs': runs,
-            'graphJSON': graphJSON}
-
-    # variants
-    variants = data_preparation.get_multisample_stats_df(run_id)
-    data['variants'] = variants if variants else False
+            'graphJSON': graphJSON,
+            'ids': ids,
+            'variants': variants if variants else False}
 
     if request.method == 'POST' and request.form.get('gene_names'):
         try:
