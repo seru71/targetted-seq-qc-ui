@@ -29,6 +29,14 @@ def get_coverage_sample_summary_path(run_id, sample_id):
     return os.path.join(sample_path, '{}.coverage.sample_summary'.format(sample_id))
 
 
+def get_sample_coverage_path(run_id):
+    return os.path.join(FOLDER_WITH_RUNS, run_id, DATA_SUMMARY_FOLDER, f'{run_id}.sample_coverage')
+
+
+def get_sample_gene_coverage_path(run_id):
+    return os.path.join(FOLDER_WITH_RUNS, run_id, DATA_SUMMARY_FOLDER, f'{run_id}.gene_coverage')
+
+
 def get_sample_gene_summary_path(run_id, sample_id):
     sample_path = os.path.join(FOLDER_WITH_RUNS, run_id, sample_id)
     return os.path.join(sample_path, '{}.coverage.sample_gene_summary'.format(sample_id))
@@ -71,3 +79,7 @@ def get_fastqc_report_path(run_id, sample_id, r):
     except IndexError:
         pass
     return False
+
+
+def get_multisample_vcf_stats_path(run_id):
+    return os.path.join(get_run_path(run_id), DATA_SUMMARY_FOLDER, '{}.multisample.vcf.stats'.format(run_id))
