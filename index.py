@@ -5,11 +5,11 @@ import pandas as pd
 import json
 import plotly
 import plotly.plotly as py
-import plotly.graph_objs as go
 
 import data_preparation
 import paths_processing
 
+from graphs import *
 from flask import Flask, render_template, request, url_for
 
 DATA_FOLDER = os.path.join(*['static', 'test-data', 'results-archive'])
@@ -35,60 +35,11 @@ def specific_run(run_id):
     runs = os.listdir(DATA_FOLDER)
 
     # presenting plot
-    x_label = ['Sample ' + x for x in sample_summary_table['Sample ID'].astype('str')]
-
-    # variants
     variants, variants_df = data_preparation.get_multisample_stats_df(run_id)
 
-    if variants:
-        x_label_variants = ['Sample ' + x for x in variants_df['Sample'].astype('str')]
-
     graphs = [
-        dict(
-            data=[
-                dict(
-                    go.Bar(
-                        x=x_label,
-                        y=sample_summary_table['Mean'],
-                        name='Mean'
-                    )
-                ),
-                dict(
-                    go.Bar(
-                        x=x_label,
-                        y=sample_summary_table['Above 20%'],
-                        name='Above 20%')
-                )
-            ]
-        ),
-        dict(
-            data=[
-                dict(
-                    go.Bar(
-                        x=x_label_variants,
-                        y=variants_df.nNonRefHom,
-                        name='nNonRefHom',
-                    )
-                ),
-                dict(
-                    go.Bar(
-                        x=x_label_variants,
-                        y=variants_df.nHets,
-                        name='nHets',
-                    )
-                ),
-                dict(
-                    go.Bar(
-                        x=x_label_variants,
-                        y=variants_df.nIndels,
-                        name='nIndels',
-                    )
-                )
-            ],
-            layout=go.Layout(
-                barmode='stack'
-            )
-        )
+        sample_summary_graph(sample_summary_table),
+        variants_graph(variants_df)
     ]
 
     graphJSON = json.dumps(graphs, cls=plotly.utils.PlotlyJSONEncoder)
