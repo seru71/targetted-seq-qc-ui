@@ -48,7 +48,6 @@ def extract_data_from_multisample_stats(path):
 
 def get_multisample_stats_df(run_id):
     path = paths_processing.get_multisample_vcf_stats_path(run_id)
-    print(path, paths_processing.check_existence(path))
 
     if not paths_processing.check_existence(path):
         return False
@@ -61,4 +60,4 @@ def get_multisample_stats_df(run_id):
     df.drop(columns=['PSC', 'id'], axis=1, inplace=True)
     df['Total'] = df['nNonRefHom'] + df['nHets'] + df['nIndels']
 
-    return df.to_html(classes='table table-sm table-hover', index=False)
+    return df.to_html(classes='table table-sm table-hover', index=False), df

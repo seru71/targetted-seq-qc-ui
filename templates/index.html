@@ -68,11 +68,14 @@
 <!--end for plotly-->
 
 <script type="text/javascript">
-
     var graphs = {{graphJSON | safe}};
+    var ids = {{ids | safe}};
 
-    Plotly.plot('chart',graphs,{});
-
+    for(var i in graphs) {
+        Plotly.plot(ids[i],
+                    graphs[i].data,
+                    graphs[i].layout || {});
+    }
 </script>
 
 </body>
