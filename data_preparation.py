@@ -50,7 +50,7 @@ def get_multisample_stats_df(run_id):
     path = paths_processing.get_multisample_vcf_stats_path(run_id)
 
     if not paths_processing.check_existence(path):
-        return False
+        return False, False
 
     lines = extract_data_from_multisample_stats(paths_processing.get_system_path(path))
     labels = ['PSC', 'id', 'Sample', 'nRefHom', 'nNonRefHom', 'nHets', 'nTransitions', 'nTransversions', 'nIndels',
