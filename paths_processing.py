@@ -10,14 +10,14 @@ FASTQ = 'fastqs'
 READ_QC = 'read_qc'
 
 
+def check_existence(path):
+    return os.path.isfile(get_system_path(path))
+
+
 def get_url_for(path):
     if check_existence(path):
         return url_for('static', filename=path.replace(os.sep, '/'))
     return False
-
-
-def check_existence(path):
-    return os.path.isfile(get_system_path(path))
 
 
 def get_system_path(path):
