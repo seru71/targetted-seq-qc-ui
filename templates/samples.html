@@ -1,13 +1,13 @@
 {% extends "index.html" %}
 
 {% block content %}
-    <h2>Samples available:</h2>
-        {% for key, value in samples.items() %}
-        <h3>{{ key }}</h3>
-            {% for run_id, sample_id in value %}
-            <ul>
-                <li><a href="samples/{{ run_id }}/{{ sample_id }}">{{ sample_id }}</a></li>
-            </ul>
-            {% endfor %}
+    <h3><b>Samples available:</b></h3>
+    {% for key, value in samples.items() %}
+    <h3><a href="{{ url_for('.specific_run', run_id=key) }}">{{ key }}</a></h3>
+    <ul>
+        {% for run_id, sample_id in value %}
+        <li><a href="{{ url_for('.specific_sample', run_id=run_id, sample_id=sample_id) }}">{{ sample_id }}</a></li>
         {% endfor %}
+    </ul>
+    {% endfor %}
 {% endblock %}

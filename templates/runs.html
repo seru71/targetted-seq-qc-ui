@@ -1,10 +1,10 @@
 {% extends "index.html" %}
 
 {% block content %}
-    <h2>Runs available:</h2>
+    <h3><b>Runs available:</b></h3>
     <ul>
         {% for run in runs %}
-        <li><a href="runs/{{ run }}">{{ run }}</a></li>
+        <li><a href="{{ url_for('.specific_run', run_id=run) }}">{{ run }}</a></li>
         {% endfor %}
     </ul>
 {% endblock %}
