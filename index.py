@@ -64,6 +64,10 @@ def specific_run(run_id):
             'runs': runs,
             'graphJSON': graphJSON}
 
+    # variants
+    variants = data_preparation.get_multisample_stats_df(run_id)
+    data['variants'] = variants if variants else False
+
     if request.method == 'POST' and request.form.get('gene_names'):
         try:
             data['genes'] = [x.strip() for x in request.form.get('gene_names').split(',')]
@@ -112,7 +116,7 @@ def specific_sample(run_id, sample_id):
             'samples': samples_paths(os.listdir(DATA_FOLDER))}
 
     # update dict with links to download files and reports
-    data.update(file_paths(run_id, sample_id))
+    data.update(links_to_external_download_data_and_reports(run_id, sample_id))
 
     data['coverage_sample_summary'] = get_coverage_sample_summary_table(run_id, sample_id)
 
@@ -145,7 +149,7 @@ def get_coverage_sample_summary_table(run_id, sample_id):
     return coverage_sample_summary.to_html(classes='table table-sm table-hover', index=False)
 
 
-def file_paths(run_id, sample_id):
+def links_to_external_download_data_and_reports(run_id, sample_id):
     data = {}
 
     # download files

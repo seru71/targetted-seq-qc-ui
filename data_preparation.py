@@ -1,14 +1,13 @@
 import pandas as pd
-import os
 
-from index import DATA_FOLDER, DATA_SUMMARY_FOLDER
+import paths_processing
 
 
 def get_summary(run_id):
     columns = ['sample_id', 'total', 'mean', '%_bases_above_5', '%_bases_above_10', '%_bases_above_20']
     new_columns = ['Sample ID', 'Total', 'Mean', 'Above 5%', 'Above 10%', 'Above 20%']
 
-    summary_path = os.path.join(DATA_FOLDER, run_id, DATA_SUMMARY_FOLDER, f'{run_id}.sample_coverage')
+    summary_path = paths_processing.get_system_path(paths_processing.get_sample_coverage_path(run_id))
 
     sample_summary = pd.read_csv(summary_path, delimiter='\t', index_col=False, usecols=columns)
     sample_summary.rename(columns=dict(zip(columns, new_columns)), inplace=True)
@@ -31,13 +30,35 @@ def prepare_mean_columns_df(df):
 
 
 def get_gene_summary(run_id):
-    summary_path = os.path.join(DATA_FOLDER, run_id, DATA_SUMMARY_FOLDER, '{}.gene_coverage'.format(run_id))
+    summary_path = paths_processing.get_system_path(paths_processing.get_sample_gene_coverage_path(run_id))
 
     sample_gene_summary = pd.read_csv(summary_path, delimiter='\t', index_col=False)
     return sample_gene_summary
 
 
-if __name__ == '__main__':
-    # all_metrics = pd.read_csv(os.path.join(DATA_FILE, 'all_sample.alignment_metrics'), delimiter='\t')
-    print(get_summary('171030_NB551023_0034_AHYF5YBGX2'))
-    print(get_gene_summary('171030_NB551023_0034_AHYF5YBGX2'))
+def extract_data_from_multisample_stats(path):
+    lines = []
+    with open(path, 'r') as file:
+        for line in file.readlines():
+            if line.startswith('PSC'):
+                lines.append(line.strip().split('\t'))
+
+    return lines
+
+
+def get_multisample_stats_df(run_id):
+    path = paths_processing.get_multisample_vcf_stats_path(run_id)
+    print(path, paths_processing.check_existence(path))
+
+    if not paths_processing.check_existence(path):
+        return False
+
+    lines = extract_data_from_multisample_stats(paths_processing.get_system_path(path))
+    labels = ['PSC', 'id', 'Sample', 'nRefHom', 'nNonRefHom', 'nHets', 'nTransitions', 'nTransversions', 'nIndels',
+              'average depth', 'nSingletons', 'nHapRef', 'nHapAlt', 'nMissing']
+
+    df = pd.DataFrame(lines, columns=labels)
+    df.drop(columns=['PSC', 'id'], axis=1, inplace=True)
+    df['Total'] = df['nNonRefHom'] + df['nHets'] + df['nIndels']
+
+    return df.to_html(classes='table table-sm table-hover', index=False)

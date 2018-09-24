@@ -27,7 +27,11 @@
 {% endif %}
 
 
+{% if variants %}
 <h3>Variants</h3>
+    {{ variants|safe }}
+{% endif %}
+
 {% endblock %}
 
 
