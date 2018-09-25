@@ -36,10 +36,57 @@ def specific_run(run_id):
 
     # presenting plot
     variants, variants_df = data_preparation.get_multisample_stats_df(run_id)
+    x_label = ['Sample ' + x for x in sample_summary_table['Sample ID'].astype('str')]
+
+    if variants != False:
+        x_label_variants = ['Sample ' + x for x in variants_df['Sample'].astype('str')]
 
     graphs = [
-        sample_summary_graph(sample_summary_table),
-        variants_graph(variants_df)
+        dict(
+            data=[
+                dict(
+                    go.Bar(
+                        x=x_label,
+                        y=sample_summary_table['Mean'],
+                        name='Mean'
+                    )
+                ),
+                dict(
+                    go.Bar(
+                        x=x_label,
+                        y=sample_summary_table['Above 20%'],
+                        name='Above 20%')
+                )
+            ]
+        ),
+        dict(
+            data=[
+                dict(
+                    go.Bar(
+                        x=x_label_variants,
+                        y=variants_df.nNonRefHom,
+                        name='nNonRefHom',
+                    )
+                ),
+                dict(
+                    go.Bar(
+                        x=x_label_variants,
+                        y=variants_df.nHets,
+                        name='nHets',
+                    )
+                ),
+                dict(
+                    go.Bar(
+                        x=x_label_variants,
+                        y=variants_df.nIndels,
+                        name='nIndels',
+                    )
+                )
+            ],
+            layout=go.Layout(
+                barmode='stack'
+            )
+        )
     ]
 
     graphJSON = json.dumps(graphs, cls=plotly.utils.PlotlyJSONEncoder)
