@@ -6,17 +6,16 @@ def sample_summary_graph(df):
     return dict(
         data=[
             dict(
-                go.Bar(
-                    x=x_label,
-                    y=df['Mean'],
-                    name='Mean'
-                )
+                x=x_label,
+                y=df['Mean'],
+                name='Mean',
+                type='bar'
             ),
             dict(
-                go.Bar(
-                    x=x_label,
-                    y=df['Above 20%'],
-                    name='Above 20%')
+                x=x_label,
+                y=df['Above 20%'],
+                name='Above 20%',
+                type='bar'
             )
         ]
     )
@@ -28,25 +27,22 @@ def variants_graph(df):
         return dict(
             data=[
                 dict(
-                    go.Bar(
-                        x=x_label_variants,
-                        y=df.nNonRefHom,
-                        name='nNonRefHom',
-                    )
+                    x=x_label_variants,
+                    y=df.nNonRefHom,
+                    name='nNonRefHom',
+                    type='bar'
                 ),
                 dict(
-                    go.Bar(
-                        x=x_label_variants,
-                        y=df.nHets,
-                        name='nHets',
-                    )
+                    x=x_label_variants,
+                    y=df.nHets,
+                    name='nHets',
+                    type='bar'
                 ),
                 dict(
-                    go.Bar(
-                        x=x_label_variants,
-                        y=df.nIndels,
-                        name='nIndels',
-                    )
+                    x=x_label_variants,
+                    y=df.nIndels,
+                    name='nIndels',
+                    type='bar'
                 )
             ],
             layout=go.Layout(
