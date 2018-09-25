@@ -23,7 +23,7 @@ def sample_summary_graph(df):
 
 
 def variants_graph(df):
-    if df:
+    if not type(df) == bool:
         x_label_variants = ['Sample ' + x for x in df['Sample'].astype('str')]
         return dict(
             data=[
