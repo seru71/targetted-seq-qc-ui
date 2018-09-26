@@ -3,7 +3,7 @@
 {% block content %}
 <h3><b>Run ID:</b> {{ run_id }}</h3>
 <h3>Graphical representation:</h3>
-<div id="chart" class="chart"></div>
+<div id={{ ids[0] }}></div>
 <h3>Gene coverage</h3>
 {{ sample_summary_table|safe }}
 
@@ -28,6 +28,15 @@
 
 
 <h3>Variants</h3>
+{% if variants %}
+    {{ variants|safe }}
+    <div id={{ ids[1] }}></div>
+{% else %}
+<div class="alert alert-info" role="alert">
+  There are no variants available.
+</div>
+{% endif %}
+
 {% endblock %}
 
 

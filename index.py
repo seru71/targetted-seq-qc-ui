@@ -1,15 +1,14 @@
 import os
-import glob
 import pandas as pd
 
 import json
 import plotly
 import plotly.plotly as py
-import plotly.graph_objs as go
 
 import data_preparation
 import paths_processing
 
+from graphs import *
 from flask import Flask, render_template, request, url_for
 
 DATA_FOLDER = os.path.join(*['static', 'test-data', 'results-archive'])
@@ -35,21 +34,15 @@ def specific_run(run_id):
     runs = os.listdir(DATA_FOLDER)
 
     # presenting plot
-    x_label = ['Sample ' + x for x in sample_summary_table['Sample ID'].astype('str')]
+    variants, variants_df = data_preparation.get_multisample_stats_df(run_id)
 
-    trace0 = go.Bar(
-        x= x_label,
-        y=sample_summary_table['Mean'],
-        name='Mean'
-    )
-    trace1 = go.Bar(
-        x=x_label,
-        y=sample_summary_table['Above 20%'],
-        name='Above 20%',
-    )
+    graphs = [
+        sample_summary_graph(sample_summary_table),
+        variants_graph(variants_df)
+    ]
 
-    data = [trace0, trace1]
-    graphJSON = json.dumps(data, cls=plotly.utils.PlotlyJSONEncoder)
+    graphJSON = json.dumps(graphs, cls=plotly.utils.PlotlyJSONEncoder)
+    ids = ['graph-{}'.format(i) for i, _ in enumerate(graphs)]
 
     unique_genes = set([x.split('_')[0] for x in mean_cols_df.Gene])
 
@@ -62,7 +55,9 @@ def specific_run(run_id):
             'sample_summary_table': table,
             'unique_genes': unique_genes,
             'runs': runs,
-            'graphJSON': graphJSON}
+            'graphJSON': graphJSON,
+            'ids': ids,
+            'variants': variants if variants else False}
 
     if request.method == 'POST' and request.form.get('gene_names'):
         try:
@@ -112,7 +107,7 @@ def specific_sample(run_id, sample_id):
             'samples': samples_paths(os.listdir(DATA_FOLDER))}
 
     # update dict with links to download files and reports
-    data.update(file_paths(run_id, sample_id))
+    data.update(links_to_external_download_data_and_reports(run_id, sample_id))
 
     data['coverage_sample_summary'] = get_coverage_sample_summary_table(run_id, sample_id)
 
@@ -145,7 +140,7 @@ def get_coverage_sample_summary_table(run_id, sample_id):
     return coverage_sample_summary.to_html(classes='table table-sm table-hover', index=False)
 
 
-def file_paths(run_id, sample_id):
+def links_to_external_download_data_and_reports(run_id, sample_id):
     data = {}
 
     # download files
