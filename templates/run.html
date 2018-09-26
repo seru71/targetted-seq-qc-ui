@@ -32,7 +32,9 @@
     {{ variants|safe }}
     <div id={{ ids[1] }}></div>
 {% else %}
-<p>There are no variants available.</p>
+<div class="alert alert-info" role="alert">
+  There are no variants available.
+</div>
 {% endif %}
 
 {% endblock %}
