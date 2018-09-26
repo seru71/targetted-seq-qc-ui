@@ -37,6 +37,15 @@
 </div>
 {% endif %}
 
+<h3>Variant annotations</h3>
+{% if variants_annotations %}
+    <div id="{{ ids[2] }}"></div>
+{% else %}
+    <div class="alert alert-info" role="alert">
+      There are no variants annotations available.
+    </div>
+{% endif %}
+
 {% endblock %}
 
 
