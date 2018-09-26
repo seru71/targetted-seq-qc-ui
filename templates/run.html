@@ -27,11 +27,12 @@
 {% endif %}
 
 
-{% if variants %}
 <h3>Variants</h3>
+{% if variants %}
     {{ variants|safe }}
     <div id={{ ids[1] }}></div>
-
+{% else %}
+<p>There are no variants available.</p>
 {% endif %}
 
 {% endblock %}
