@@ -1,105 +1,103 @@
 {% extends "index.html" %}
 
 {% block content %}
-    <h3><b>Run ID:</b> <a href="{{ url_for('.specific_run', run_id=run_id) }}">{{ run_id }}</a></h3>
-    <h3><b>Sample ID:</b> {{ sample_id }}</h3>
-    {{ coverage_sample_summary|safe }}
+<h3><b>Run ID:</b> <a href="{{ url_for('.specific_run', run_id=run_id) }}">{{ run_id }}</a></h3>
+<h3><b>Sample ID:</b> {{ sample_id }}</h3>
+{{ coverage_sample_summary|safe }}
 
-    <div class="row">
-        <div class="col">
+<div class="div-margin">
     <h3>Download:</h3>
-        {% if fastq_path_r1 %}
-        <a class="btn btn-primary" href="{{ fastq_path_r1 }}" role="button">FASTQ R1</a>
-        {% else %}
-        <a class="btn btn-secondary disabled" href="{{ fastq_path_r1 }}" role="button">FASTQ R1</a>
-        {% endif %}
-
-        {% if fastq_path_r2 %}
-        <a class="btn btn-primary" href="{{ fastq_path_r2 }}" role="button">FASTQ R2</a>
-        {% else %}
-        <a class="btn btn-secondary disabled" href="{{ fastq_path_r2 }}" role="button">FASTQ R2</a>
-        {% endif %}
-
-        {% if bam_path %}
-        <a class="btn btn-primary" href="{{ bam_path }}" role="button">BAM</a>
-        {% else %}
-        <a class="btn btn-secondary disabled" href="{{ bam_path }}" role="button">BAM</a>
-        {% endif %}
-
-        {% if vcf_path %}
-        <a class="btn btn-primary" href="{{ vcf_path }}" role="button">VCF</a>
-        {% else %}
-        <a class="btn btn-secondary disabled" href="{{ vcf_path }}" role="button">VCF</a>
-        {% endif %}
-    </div>
-        <div class="col">
-        <h3>Reports:</h3>
-
-        <h5>Trimmed</h5>
-        {% if fq1_fastqc %}
-        <a class="btn btn-primary" href="{{ fq1_fastqc }}" role="button">FASTQ FQ1</a>
-        {% else %}
-        <a class="btn btn-secondary disabled" href="{{ fq1_fastqc }}" role="button">FASTQ FQ1</a>
-        {% endif %}
-
-        {% if fq2_fastqc %}
-        <a class="btn btn-primary" href="{{ fq2_fastqc }}" role="button">FASTQ FQ2</a>
-        {% else %}
-        <a class="btn btn-secondary disabled" href="{{ fq2_fastqc }}" role="button">FASTQ FQ2</a>
-        {% endif %}
-
-        <h5>Raw</h5>
-        {% if R1_001_fastqc %}
-        <a class="btn btn-primary" href="{{ R1_001_fastqc }}" role="button">FASTQ R1</a>
-        {% else %}
-        <a class="btn btn-secondary disabled" href="{{ R1_001_fastqc }}" role="button">FASTQ R1</a>
-        {% endif %}
-
-        {% if R2_001_fastqc %}
-        <a class="btn btn-primary" href="{{ R2_001_fastqc }}" role="button">FASTQ R2</a>
-        {% else %}
-        <a class="btn btn-secondary disabled" href="{{ R2_001_fastqc }}" role="button">FASTQ R2</a>
-        {% endif %}
-    </div>
-        <div class="col">
-            <h3>Gene coverage:</h3>
-
-            <p>Please enter gene names separated by the comma (for example "OR4F16, TTLL10").</p>
-            <form method="POST", name="genes">
-                <input name="gene_names">
-                <input type="submit">
-            </form>
-        </div>
-    </div>
-
-    {% if genes %}
-        <p><b>Genes selected: </b>
-        {% for gene in genes %}
-            '{{ gene }}'
-        {% endfor %}
-        </p>
-
-        {% if coverage_sample_gene_summary %}
-            {{ coverage_sample_gene_summary|safe }}
-        {% endif %}
+    {% if fastq_path_r1 %}
+    <a class="btn btn-primary" href="{{ fastq_path_r1 }}" role="button">FASTQ R1</a>
+    {% else %}
+    <a class="btn btn-secondary disabled" href="{{ fastq_path_r1 }}" role="button">FASTQ R1</a>
     {% endif %}
+
+    {% if fastq_path_r2 %}
+    <a class="btn btn-primary" href="{{ fastq_path_r2 }}" role="button">FASTQ R2</a>
+    {% else %}
+    <a class="btn btn-secondary disabled" href="{{ fastq_path_r2 }}" role="button">FASTQ R2</a>
+    {% endif %}
+
+    {% if bam_path %}
+    <a class="btn btn-primary" href="{{ bam_path }}" role="button">BAM</a>
+    {% else %}
+    <a class="btn btn-secondary disabled" href="{{ bam_path }}" role="button">BAM</a>
+    {% endif %}
+
+    {% if vcf_path %}
+    <a class="btn btn-primary" href="{{ vcf_path }}" role="button">VCF</a>
+    {% else %}
+    <a class="btn btn-secondary disabled" href="{{ vcf_path }}" role="button">VCF</a>
+    {% endif %}
+</div>
+<div class="div-margin">
+    <h3>Reports:</h3>
+
+    <h5>Trimmed</h5>
+    {% if fq1_fastqc %}
+    <a class="btn btn-primary" href="{{ fq1_fastqc }}" role="button">FASTQ FQ1</a>
+    {% else %}
+    <a class="btn btn-secondary disabled" href="{{ fq1_fastqc }}" role="button">FASTQ FQ1</a>
+    {% endif %}
+
+    {% if fq2_fastqc %}
+    <a class="btn btn-primary" href="{{ fq2_fastqc }}" role="button">FASTQ FQ2</a>
+    {% else %}
+    <a class="btn btn-secondary disabled" href="{{ fq2_fastqc }}" role="button">FASTQ FQ2</a>
+    {% endif %}
+
+    <h5>Raw</h5>
+    {% if R1_001_fastqc %}
+    <a class="btn btn-primary" href="{{ R1_001_fastqc }}" role="button">FASTQ R1</a>
+    {% else %}
+    <a class="btn btn-secondary disabled" href="{{ R1_001_fastqc }}" role="button">FASTQ R1</a>
+    {% endif %}
+
+    {% if R2_001_fastqc %}
+    <a class="btn btn-primary" href="{{ R2_001_fastqc }}" role="button">FASTQ R2</a>
+    {% else %}
+    <a class="btn btn-secondary disabled" href="{{ R2_001_fastqc }}" role="button">FASTQ R2</a>
+    {% endif %}
+</div>
+<div class="div-margin">
+    <h3>Gene coverage:</h3>
+
+    <p>Please enter gene names separated by the comma (for example "OR4F16, TTLL10").</p>
+    <form method="POST" , name="genes">
+        <input name="gene_names">
+        <input type="submit">
+    </form>
+</div>
+
+{% if genes %}
+<p><b>Genes selected: </b>
+    {% for gene in genes %}
+        '{{ gene }}'
+    {% endfor %}
+</p>
+
+    {% if coverage_sample_gene_summary %}
+        {{ coverage_sample_gene_summary|safe }}
+    {% endif %}
+{% endif %}
 {% endblock %}
 
 
 {% block left_menu %}
-    <!--presentation of current run collapsed in left menu-->
-    <h3><b>Selected run samples:</b></h3>
-    {% with value=samples[run_id], run_id=run_id %}
-        {% include '_card_collapsed.html' %}
-    {% endwith %}
+<!--presentation of current run collapsed in left menu-->
+<h3><b>Selected run samples:</b></h3>
+{% with value=samples[run_id], run_id=run_id %}
+    {% include '_card_collapsed.html' %}
+{% endwith %}
 
-    <!--presentation of every run but currently viewing one-->
-    <h3><b>Other runs samples:</b></h3>
-    <div class="accordion">
+<!--presentation of every run but currently viewing one-->
+<h3><b>Other runs samples:</b></h3>
+<div class="accordion">
     {% for key, value in samples.items() %}
-        {% if not key==run_id %}
-            {% include '_card.html' %}
-        {% endif %}
+    {% if not key==run_id %}
+        {% include '_card.html' %}
+    {% endif %}
     {% endfor %}
-    </div>
+</div>
 {% endblock %}
