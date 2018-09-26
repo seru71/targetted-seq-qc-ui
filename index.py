@@ -36,9 +36,17 @@ def specific_run(run_id):
     # presenting plot
     variants, variants_df = data_preparation.get_multisample_stats_df(run_id)
 
+    # variants annotations
+    path = paths_processing.get_system_path(paths_processing.get_annotated_variants_stats_path(run_id))
+    if paths_processing.check_existence(path, system_path=True):
+        variants_annotations_df = pd.read_csv(path, delimiter='\t')
+    else:
+        variants_annotations_df = False
+
     graphs = [
         sample_summary_graph(sample_summary_table),
-        variants_graph(variants_df)
+        variants_graph(variants_df),
+        variants_annotations_graph(variants_annotations_df),
     ]
 
     graphJSON = json.dumps(graphs, cls=plotly.utils.PlotlyJSONEncoder)
@@ -58,6 +66,7 @@ def specific_run(run_id):
             'graphJSON': graphJSON,
             'ids': ids,
             'variants': variants if variants else False,
+            'variants_annotations': variants_annotations_df if variants_annotations_df is False else True,
             'genes': ['HNF1B', 'HNF1A', 'HNF4A']}
 
     mean_cols_df['gene_name'] = mean_cols_df.Gene.apply(lambda x: x.split('_')[0])
