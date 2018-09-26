@@ -36,9 +36,17 @@ def specific_run(run_id):
     # presenting plot
     variants, variants_df = data_preparation.get_multisample_stats_df(run_id)
 
+    # variants annotations
+    path = paths_processing.get_system_path(paths_processing.get_annotated_variants_stats_path(run_id))
+    if paths_processing.check_existence(path, system_path=True):
+        variants_annotations_df = pd.read_csv(path, delimiter='\t')
+    else:
+        variants_annotations_df = False
+
     graphs = [
         sample_summary_graph(sample_summary_table),
-        variants_graph(variants_df)
+        variants_graph(variants_df),
+        variants_annotations_graph(variants_annotations_df),
     ]
 
     graphJSON = json.dumps(graphs, cls=plotly.utils.PlotlyJSONEncoder)
@@ -57,7 +65,8 @@ def specific_run(run_id):
             'runs': runs,
             'graphJSON': graphJSON,
             'ids': ids,
-            'variants': variants if variants else False}
+            'variants': variants if variants else False,
+            'variants_annotations': variants_annotations_df if variants_annotations_df is False else True}
 
     if request.method == 'POST' and request.form.get('gene_names'):
         try:

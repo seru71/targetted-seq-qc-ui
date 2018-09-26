@@ -10,7 +10,9 @@ FASTQ = 'fastqs'
 READ_QC = 'read_qc'
 
 
-def check_existence(path):
+def check_existence(path, system_path=False):
+    if system_path:
+        return os.path.isfile(path)
     return os.path.isfile(get_system_path(path))
 
 
@@ -68,6 +70,11 @@ def get_vcf_path(run_id, sample_id):
 def get_fq_fastqc_path(run_id, sample_id, fq):
     reports_path = os.path.join(FOLDER_WITH_RUNS, run_id, DATA_SUMMARY_FOLDER, READ_QC)
     return os.path.join(reports_path, '{}.fq{}_fastqc.html'.format(sample_id, fq))
+
+
+def get_annotated_variants_stats_path(run_id):
+    reports_path = os.path.join(FOLDER_WITH_RUNS, run_id, DATA_SUMMARY_FOLDER)
+    return os.path.join(reports_path, '{}.annotated_variant_stats'.format(run_id))
 
 
 def get_fastqc_report_path(run_id, sample_id, r):

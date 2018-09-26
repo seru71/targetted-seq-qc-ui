@@ -50,3 +50,23 @@ def variants_graph(df):
             )
         )
     return None
+
+
+def variants_annotations_graph(df):
+    def get_trace(df, column):
+        x_label = ['Sample ' + x for x in df['sample'].astype(str)]
+        return dict(
+            x=x_label,
+            y=df[column],
+            name=column,
+            type='bar'
+        )
+
+    if df is False:
+        return False
+
+    columns = df.columns[1:]
+
+    return dict(
+        data=[get_trace(df, column) for column in columns]
+    )
