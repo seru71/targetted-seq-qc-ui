@@ -66,7 +66,15 @@ def specific_run(run_id):
             'graphJSON': graphJSON,
             'ids': ids,
             'variants': variants if variants else False,
-            'variants_annotations': variants_annotations_df if variants_annotations_df is False else True}
+            'variants_annotations': variants_annotations_df if variants_annotations_df is False else True,
+            'genes': ['HNF1B', 'HNF1A', 'HNF4A']}
+
+    mean_cols_df['gene_name'] = mean_cols_df.Gene.apply(lambda x: x.split('_')[0])
+    df = mean_cols_df.loc[mean_cols_df['gene_name'].isin(data['genes'])]
+
+    df.drop(columns=['gene_name'], inplace=True)
+    df = data_preparation.prepare_mean_columns_df(df)
+    data['selected_genes_df'] = df.to_html(classes='table table-sm table-hover', index=False)
 
     if request.method == 'POST' and request.form.get('gene_names'):
         try:
