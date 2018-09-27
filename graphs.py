@@ -65,7 +65,7 @@ def variants_annotations_graph(df):
     if df is False:
         return False
 
-    columns = df.columns[1:]
+    columns = [x for x in df.columns[1:] if 'exonic' in x]
 
     return dict(
         data=[get_trace(df, column) for column in columns]
