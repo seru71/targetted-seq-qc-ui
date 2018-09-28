@@ -90,3 +90,8 @@ def get_fastqc_report_path(run_id, sample_id, r):
 
 def get_multisample_vcf_stats_path(run_id):
     return os.path.join(get_run_path(run_id), DATA_SUMMARY_FOLDER, '{}.multisample.vcf.stats'.format(run_id))
+
+
+def get_sample_variations_path(run_id, sample_id):
+    return os.path.join(get_sample_path(run_id, sample_id), '{}.vcf'.format(sample_id))
+
