@@ -110,6 +110,5 @@ def get_variations_sample_df(run_id, sample_id, save_pickle=False):
 
     if save_pickle:
         df.to_pickle(path_join(sample_folder_path, f'{sample_id}.sample_variants.pkl'))
-        print('saved')
 
     return data[IMPORTANT_COLUMNS].iloc[:10]
