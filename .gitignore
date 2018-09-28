@@ -235,7 +235,6 @@ $RECYCLE.BIN/
 # Data folder
 data/
 
-# Images
-static/**/*.png
-
+# Pickle files
+*.pkl
 # End of https://www.gitignore.io/api/linux,python,windows,pycharm+all,jupyternotebook
