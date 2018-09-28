@@ -129,7 +129,7 @@ def specific_sample(run_id, sample_id):
     data['coverage_sample_summary'] = get_coverage_sample_summary_table(run_id, sample_id)
     if pp.check_existence(pp.get_sample_variations_path(run_id, sample_id), system_path=False):
         data['sample_variations'] = data_preparation.get_variations_sample_df(run_id, sample_id, True).to_html(
-            classes='table table-sm table-hover', index=False)
+            classes='table table-striped table-bordered table-hover', index=False, table_id='sample_variants')
     else:
         data['sample_variations'] = False
 

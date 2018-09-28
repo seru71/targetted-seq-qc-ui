@@ -88,7 +88,7 @@ def get_variations_sample_df(run_id, sample_id, save_pickle=False):
         external_information = pd.Series(new_cols_value, index=new_cols)
         return row.append(external_information)
 
-    IMPORTANT_COLUMNS = ['#CHROM', 'POS', 'REF', 'ALT', 'QUAL', 'GT', 'AD', 'DP']
+    important_columns = ['#CHROM', 'POS', 'REF', 'ALT', 'QUAL', 'GT', 'AD', 'DP']
 
     path = paths_processing.get_sample_variations_path(run_id, sample_id)
     system_path = paths_processing.get_system_path(path)
@@ -98,7 +98,7 @@ def get_variations_sample_df(run_id, sample_id, save_pickle=False):
     pickle_path = path_join(sample_folder_path, f'{sample_id}.sample_variants.pkl')
 
     if paths_processing.check_existence(pickle_path, system_path=True):
-        return pd.read_pickle(pickle_path)[IMPORTANT_COLUMNS].iloc[:10]
+        return pd.read_pickle(pickle_path)[important_columns]
 
     lines = read_data(system_path)
     df = process_sample_vcf(lines)
@@ -111,4 +111,4 @@ def get_variations_sample_df(run_id, sample_id, save_pickle=False):
     if save_pickle:
         df.to_pickle(path_join(sample_folder_path, f'{sample_id}.sample_variants.pkl'))
 
-    return data[IMPORTANT_COLUMNS].iloc[:10]
+    return data[important_columns]
