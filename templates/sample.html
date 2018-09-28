@@ -85,7 +85,7 @@
 <div class="div-margin">
     <h3>Sample Variants</h3>
     {% if sample_variations %}
-        {{ sample_variations|safe }}
+        <table id="sample_variants" class="display" width="100%"></table>
     {% else %}
     <div class="alert alert-info" role="alert">
       There are no variants available.

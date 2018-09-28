@@ -87,7 +87,19 @@
 
 <script type="text/javascript" language="javascript" class="init">
     $(document).ready(function() {
-        $('#sample_variants').DataTable();
+        $('#sample_variants').DataTable({
+            data: {{ sample_variations | safe }},
+            columns: [
+                { title: "#CHROM" },
+                { title: "POS" },
+                { title: "REF" },
+                { title: "ALT" },
+                { title: "QUAL" },
+                { title: "GT" },
+                { title: "AD" },
+                { title: "DP" },
+            ]
+        });
     } );
 </script>
 
