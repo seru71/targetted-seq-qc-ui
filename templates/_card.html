@@ -11,13 +11,13 @@
 
     <div id="a{{ key }}" class="collapse" aria-labelledby="ch{{ key }}">
         <div class="card-body">
-            <!--<ul>-->
+            <ul>
                 {% for run_id, sample_id in value %}
-                <!--<li>-->
+                <li>
                     <a href="{{ url_for('.specific_sample', run_id=run_id, sample_id=sample_id) }}">{{ sample_id }} </a>
-                <!--</li>-->
+                </li>
                 {% endfor %}
-            <!--</ul>-->
+            </ul>
         </div>
     </div>
 </div>
