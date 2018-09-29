@@ -60,27 +60,17 @@
     <a class="btn btn-secondary disabled" href="{{ R2_001_fastqc }}" role="button">FASTQ R2</a>
     {% endif %}
 </div>
+
 <div class="div-margin">
     <h3>Gene coverage:</h3>
-
-    <p>Please enter gene names separated by the comma (for example "OR4F16, TTLL10").</p>
-    <form method="POST" , name="genes">
-        <input name="gene_names">
-        <input type="submit">
-    </form>
-</div>
-
-{% if genes %}
-<p><b>Genes selected: </b>
-    {% for gene in genes %}
-        '{{ gene }}'
-    {% endfor %}
-</p>
-
-    {% if coverage_sample_gene_summary %}
-        {{ coverage_sample_gene_summary|safe }}
+    {% if coverage_sample_list %}
+        <table id="coverage_sample" class="table table-sm table-hover" width="100%"></table>
+    {% else %}
+    <div class="alert alert-info" role="alert">
+      There are no data available.
+    </div>
     {% endif %}
-{% endif %}
+</div>
 
 <div class="div-margin">
     <h3>Sample Variants</h3>
@@ -112,4 +102,41 @@
     {% endif %}
     {% endfor %}
 </div>
+{% endblock %}
+
+{% block scripts %}
+
+$(document).ready(function() {
+    $('#sample_variants').DataTable({
+        data: {{ sample_variations | safe }},
+        columns: [
+            { title: "CHROM" },
+            { title: "POS" },
+            { title: "REF" },
+            { title: "ALT" },
+            { title: "QUAL" },
+            { title: "GT" },
+            { title: "AD" },
+            { title: "DP" },
+        ]
+    });
+
+    $('#coverage_sample').DataTable({
+        data: {{ coverage_sample_list | safe }},
+        columns: [
+            { title: "Gene" },
+            { title: "total_coverage" },
+            { title: "avg_coverage" },
+            { title: "%_above_10" },
+            { title: "gran_Q3" },
+            { title: "mean_cvg " },
+            { title: "gran_median" },
+            { title: "gran_Q1" },
+            { title: "total_cvg" },
+            { title: "%_above_5" },
+            { title: "%_above_20" },
+        ]
+    });
+} );
+
 {% endblock %}
