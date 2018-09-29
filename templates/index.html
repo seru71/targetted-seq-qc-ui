@@ -86,38 +86,7 @@
 </script>
 
 <script type="text/javascript" language="javascript" class="init">
-    $(document).ready(function() {
-        $('#sample_variants').DataTable({
-            data: {{ sample_variations | safe }},
-            columns: [
-                { title: "CHROM" },
-                { title: "POS" },
-                { title: "REF" },
-                { title: "ALT" },
-                { title: "QUAL" },
-                { title: "GT" },
-                { title: "AD" },
-                { title: "DP" },
-            ]
-        });
-
-        $('#coverage_sample').DataTable({
-            data: {{ coverage_sample_list | safe }},
-            columns: [
-                { title: "Gene" },
-                { title: "total_coverage" },
-                { title: "avg_coverage" },
-                { title: "%_above_10" },
-                { title: "gran_Q3" },
-                { title: "mean_cvg " },
-                { title: "gran_median" },
-                { title: "gran_Q1" },
-                { title: "total_cvg" },
-                { title: "%_above_5" },
-                { title: "%_above_20" },
-            ]
-        });
-    } );
+    {% block scripts %}{% endblock %}
 </script>
 
 </body>
