@@ -81,6 +81,18 @@
         {{ coverage_sample_gene_summary|safe }}
     {% endif %}
 {% endif %}
+
+<div class="div-margin">
+    <h3>Sample Variants</h3>
+    {% if sample_variations %}
+        <table id="sample_variants" class="table table-sm table-hover" width="100%"></table>
+    {% else %}
+    <div class="alert alert-info" role="alert">
+      There are no variants available.
+    </div>
+    {% endif %}
+</div>
+
 {% endblock %}
 
 

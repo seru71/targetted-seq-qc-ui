@@ -6,7 +6,7 @@ import plotly
 import plotly.plotly as py
 
 import data_preparation
-import paths_processing
+import paths_processing as pp
 
 from graphs import *
 from flask import Flask, render_template, request, url_for
@@ -36,9 +36,17 @@ def specific_run(run_id):
     # presenting plot
     variants, variants_df = data_preparation.get_multisample_stats_df(run_id)
 
+    # variants annotations
+    path = pp.get_system_path(pp.get_annotated_variants_stats_path(run_id))
+    if pp.check_existence(path, system_path=True):
+        variants_annotations_df = pd.read_csv(path, delimiter='\t')
+    else:
+        variants_annotations_df = False
+
     graphs = [
         sample_summary_graph(sample_summary_table),
-        variants_graph(variants_df)
+        variants_graph(variants_df),
+        variants_annotations_graph(variants_annotations_df),
     ]
 
     graphJSON = json.dumps(graphs, cls=plotly.utils.PlotlyJSONEncoder)
@@ -57,7 +65,16 @@ def specific_run(run_id):
             'runs': runs,
             'graphJSON': graphJSON,
             'ids': ids,
-            'variants': variants if variants else False}
+            'variants': variants if variants else False,
+            'variants_annotations': variants_annotations_df if variants_annotations_df is False else True,
+            'genes': ['HNF1B', 'HNF1A', 'HNF4A']}
+
+    mean_cols_df['gene_name'] = mean_cols_df.Gene.apply(lambda x: x.split('_')[0])
+    df = mean_cols_df.loc[mean_cols_df['gene_name'].isin(data['genes'])]
+
+    df.drop(columns=['gene_name'], inplace=True)
+    df = data_preparation.prepare_mean_columns_df(df)
+    data['selected_genes_df'] = df.to_html(classes='table table-sm table-hover', index=False)
 
     if request.method == 'POST' and request.form.get('gene_names'):
         try:
@@ -110,10 +127,14 @@ def specific_sample(run_id, sample_id):
     data.update(links_to_external_download_data_and_reports(run_id, sample_id))
 
     data['coverage_sample_summary'] = get_coverage_sample_summary_table(run_id, sample_id)
+    if pp.check_existence(pp.get_sample_variations_path(run_id, sample_id), system_path=False):
+        data['sample_variations'] = data_preparation.get_variations_sample_df(run_id, sample_id, True).values.tolist()
+    else:
+        data['sample_variations'] = False
 
     if request.method == 'POST' and request.form.get('gene_names'):
         try:
-            path = paths_processing.get_system_path(paths_processing.get_sample_gene_summary_path(run_id, sample_id))
+            path = pp.get_system_path(pp.get_sample_gene_summary_path(run_id, sample_id))
             coverage_sample_gene_summary = pd.read_csv(path, delimiter='\t', index_col=False)
 
             data['genes'] = [x.strip() for x in request.form.get('gene_names').split(',')]
@@ -135,7 +156,7 @@ def specific_sample(run_id, sample_id):
 
 
 def get_coverage_sample_summary_table(run_id, sample_id):
-    path = paths_processing.get_system_path(paths_processing.get_coverage_sample_summary_path(run_id, sample_id))
+    path = pp.get_system_path(pp.get_coverage_sample_summary_path(run_id, sample_id))
     coverage_sample_summary = pd.read_csv(path, delimiter='\t', index_col=False).dropna()
     return coverage_sample_summary.to_html(classes='table table-sm table-hover', index=False)
 
@@ -144,18 +165,18 @@ def links_to_external_download_data_and_reports(run_id, sample_id):
     data = {}
 
     # download files
-    fastq_path_r1, fastq_path_r2 = paths_processing.get_fastq_paths(run_id, sample_id)
+    fastq_path_r1, fastq_path_r2 = pp.get_fastq_paths(run_id, sample_id)
 
-    data['fastq_path_r1'] = paths_processing.get_url_for(fastq_path_r1)
-    data['fastq_path_r2'] = paths_processing.get_url_for(fastq_path_r2)
-    data['bam_path'] = paths_processing.get_url_for(paths_processing.get_bam_path(run_id, sample_id))
-    data['vcf_path'] = paths_processing.get_url_for(paths_processing.get_vcf_path(run_id, sample_id))
+    data['fastq_path_r1'] = pp.get_url_for(fastq_path_r1)
+    data['fastq_path_r2'] = pp.get_url_for(fastq_path_r2)
+    data['bam_path'] = pp.get_url_for(pp.get_bam_path(run_id, sample_id))
+    data['vcf_path'] = pp.get_url_for(pp.get_vcf_path(run_id, sample_id))
 
     # reports
-    data['fq1_fastqc'] = paths_processing.get_url_for(paths_processing.get_fq_fastqc_path(run_id, sample_id, 1))
-    data['fq2_fastqc'] = paths_processing.get_url_for(paths_processing.get_fq_fastqc_path(run_id, sample_id, 2))
-    data['R1_001_fastqc'] = paths_processing.get_url_for(paths_processing.get_fastqc_report_path(run_id, sample_id, 1))
-    data['R2_001_fastqc'] = paths_processing.get_url_for(paths_processing.get_fastqc_report_path(run_id, sample_id, 2))
+    data['fq1_fastqc'] = pp.get_url_for(pp.get_fq_fastqc_path(run_id, sample_id, 1))
+    data['fq2_fastqc'] = pp.get_url_for(pp.get_fq_fastqc_path(run_id, sample_id, 2))
+    data['R1_001_fastqc'] = pp.get_url_for(pp.get_fastqc_report_path(run_id, sample_id, 1))
+    data['R2_001_fastqc'] = pp.get_url_for(pp.get_fastqc_report_path(run_id, sample_id, 2))
 
     return data
 
