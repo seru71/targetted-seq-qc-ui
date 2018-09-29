@@ -100,6 +100,23 @@
                 { title: "DP" },
             ]
         });
+
+        $('#coverage_sample').DataTable({
+            data: {{ coverage_sample_list | safe }},
+            columns: [
+                { title: "Gene" },
+                { title: "total_coverage" },
+                { title: "avg_coverage" },
+                { title: "%_above_10" },
+                { title: "gran_Q3" },
+                { title: "mean_cvg " },
+                { title: "gran_median" },
+                { title: "gran_Q1" },
+                { title: "total_cvg" },
+                { title: "%_above_5" },
+                { title: "%_above_20" },
+            ]
+        });
     } );
 </script>
 
