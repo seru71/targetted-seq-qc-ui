@@ -67,6 +67,10 @@ def specific_run(run_id):
     df = data_preparation.get_gene_coverage_df(mean_cols_df, data['genes'])
     data['selected_genes_df'] = df.to_html(classes='table table-sm table-hover', index=False)
 
+    df = data_preparation.prepare_mean_columns_df(mean_cols_df)
+    df.fillna(-1, inplace=True)
+    data['coverage_sample_list'] = df.values.tolist()
+
     if request.method == 'POST' and request.form.get('gene_names'):
         try:
             data['genes'] = data_preparation.get_genes_from_request(request)
@@ -122,27 +126,9 @@ def specific_sample(run_id, sample_id):
     coverage_sample_gene_summary = pd.read_csv(path, delimiter='\t', index_col=False)
 
     df = data_preparation.prepare_mean_columns_df(coverage_sample_gene_summary)
-
-    print(df.iloc[0])
+    df.fillna(-1, inplace=True)
 
     data['coverage_sample_list'] = df.values.tolist()
-
-    if request.method == 'POST' and request.form.get('gene_names'):
-        try:
-            data['genes'] = [x.strip() for x in request.form.get('gene_names').split(',')]
-
-            coverage_sample_gene_summary['gene_name'] = coverage_sample_gene_summary.Gene.apply(lambda x: x.split('_')[0])
-            df = coverage_sample_gene_summary.loc[coverage_sample_gene_summary['gene_name'].isin(data['genes'])]
-
-            df.drop(columns=['gene_name'], inplace=True)
-
-            df = data_preparation.prepare_mean_columns_df(df)
-
-            with pd.option_context('display.max_colwidth', -1):
-                data['coverage_sample_gene_summary'] = df.to_html(classes='table table-sm table-hover', index=False)
-        except Exception as e:
-            print(e)
-            pass
 
     return render_template('sample.html', **data)
 
