@@ -26,7 +26,7 @@ def prepare_mean_columns_df(df):
     for column in unique_columns:
         columns_for_mean = [original_column_name for original_column_name in df.columns if
                             column in original_column_name]
-        df[column] = df[columns_for_mean].mean(axis=1)
+        df.loc[:, column] = df[columns_for_mean].mean(axis=1)
 
     return df.drop(columns=columns[3:])
 
@@ -112,3 +112,22 @@ def get_variations_sample_df(run_id, sample_id, save_pickle=False):
         df.to_pickle(path_join(sample_folder_path, f'{sample_id}.sample_variants.pkl'))
 
     return data[important_columns]
+
+
+def get_gene_coverage_df(mean_cols_df, genes):
+    mean_cols_df.loc[:, 'gene_name'] = mean_cols_df.Gene.apply(lambda x: x.split('_')[0])
+    df = mean_cols_df.loc[mean_cols_df['gene_name'].isin(genes)]
+
+    df.drop(columns=['gene_name'], inplace=True)
+    return prepare_mean_columns_df(df)
+
+
+def prepare_sample_summary_html_table(df, run_id):
+    with pd.option_context('display.max_colwidth', -1):
+        df.loc[:, 'Sample ID'] = df['Sample ID'].apply(
+            lambda x: '<a href=\"/runs/{run_id}/{sample_id}">{sample_id}</a>'.format(sample_id=x, run_id=run_id))
+        return df.to_html(classes='table table-sm table-hover', escape=False, index=False)
+
+
+def get_genes_from_request(request):
+    return [x.strip() for x in request.form.get('gene_names').split(',')]
