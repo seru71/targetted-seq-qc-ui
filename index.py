@@ -54,13 +54,8 @@ def specific_run(run_id):
 
     unique_genes = set([x.split('_')[0] for x in mean_cols_df.Gene])
 
-    with pd.option_context('display.max_colwidth', -1):
-        sample_summary_table['Sample ID'] = sample_summary_table['Sample ID'].apply(
-            lambda x: '<a href=\"/runs/{run_id}/{sample_id}">{sample_id}</a>'.format(sample_id=x, run_id=run_id))
-        table = sample_summary_table.to_html(classes='table table-sm table-hover', escape=False, index=False)
-
     data = {'run_id': run_id,
-            'sample_summary_table': table,
+            'sample_summary_table': data_preparation.prepare_sample_summary_html_table(sample_summary_table, run_id),
             'unique_genes': unique_genes,
             'runs': runs,
             'graphJSON': graphJSON,
@@ -69,22 +64,13 @@ def specific_run(run_id):
             'variants_annotations': variants_annotations_df if variants_annotations_df is False else True,
             'genes': ['HNF1B', 'HNF1A', 'HNF4A']}
 
-    mean_cols_df['gene_name'] = mean_cols_df.Gene.apply(lambda x: x.split('_')[0])
-    df = mean_cols_df.loc[mean_cols_df['gene_name'].isin(data['genes'])]
-
-    df.drop(columns=['gene_name'], inplace=True)
-    df = data_preparation.prepare_mean_columns_df(df)
+    df = data_preparation.get_gene_coverage_df(mean_cols_df, data['genes'])
     data['selected_genes_df'] = df.to_html(classes='table table-sm table-hover', index=False)
 
     if request.method == 'POST' and request.form.get('gene_names'):
         try:
-            data['genes'] = [x.strip() for x in request.form.get('gene_names').split(',')]
-
-            mean_cols_df['gene_name'] = mean_cols_df.Gene.apply(lambda x: x.split('_')[0])
-            df = mean_cols_df.loc[mean_cols_df['gene_name'].isin(data['genes'])]
-
-            df.drop(columns=['gene_name'], inplace=True)
-            df = data_preparation.prepare_mean_columns_df(df)
+            data['genes'] = data_preparation.get_genes_from_request(request)
+            df = data_preparation.get_gene_coverage_df(mean_cols_df, data['genes'])
             data['selected_genes_df'] = df.to_html(classes='table table-sm table-hover', index=False)
         except Exception as e:
             print(e)
