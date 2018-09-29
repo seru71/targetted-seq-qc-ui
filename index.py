@@ -118,11 +118,17 @@ def specific_sample(run_id, sample_id):
     else:
         data['sample_variations'] = False
 
+    path = pp.get_system_path(pp.get_sample_gene_summary_path(run_id, sample_id))
+    coverage_sample_gene_summary = pd.read_csv(path, delimiter='\t', index_col=False)
+
+    df = data_preparation.prepare_mean_columns_df(coverage_sample_gene_summary)
+
+    print(df.iloc[0])
+
+    data['coverage_sample_list'] = df.values.tolist()
+
     if request.method == 'POST' and request.form.get('gene_names'):
         try:
-            path = pp.get_system_path(pp.get_sample_gene_summary_path(run_id, sample_id))
-            coverage_sample_gene_summary = pd.read_csv(path, delimiter='\t', index_col=False)
-
             data['genes'] = [x.strip() for x in request.form.get('gene_names').split(',')]
 
             coverage_sample_gene_summary['gene_name'] = coverage_sample_gene_summary.Gene.apply(lambda x: x.split('_')[0])
