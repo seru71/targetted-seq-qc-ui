@@ -7,7 +7,7 @@ import plotly
 from ngs import paths_processing as pp, data_preparation
 
 from ngs.graphs import *
-from flask import Flask, render_template
+from flask import Flask, render_template, send_from_directory
 
 DATA_FOLDER = os.path.join(*['ngs', 'data', 'runs'])
 DATA_SUMMARY_FOLDER = 'qc'
@@ -66,6 +66,11 @@ def specific_run(run_id):
     data['coverage_sample_list'] = df.values.tolist()[:100]
 
     return render_template('run.html', **data)
+
+
+@server.route('/download/<path:path>')
+def download(path):
+    return send_from_directory('data/runs/', path)
 
 
 def samples_paths(runs):
