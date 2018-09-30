@@ -7,28 +7,32 @@
 
 <div class="div-margin">
     <h3>Download:</h3>
+    {% set fastq_path_r1 = run_id + '/' + 'fastqs' + '/' + sample_id + '_S1_R1_001.fastq.gz' %}
     {% if fastq_path_r1 %}
-    <a class="btn btn-primary" href="{{ fastq_path_r1 }}" role="button">FASTQ R1</a>
+    <a class="btn btn-primary" href="{{ url_for('download', path=fastq_path_r1) }}" role="button">FASTQ R1</a>
     {% else %}
-    <a class="btn btn-secondary disabled" href="{{ fastq_path_r1 }}" role="button">FASTQ R1</a>
+    <a class="btn btn-secondary disabled" href="{{ url_for('download', path=fastq_path_r1) }}" role="button">FASTQ R1</a>
     {% endif %}
 
+    {% set fastq_path_r2 = run_id + '/' + 'fastqs' + '/' + sample_id + '_S1_R2_001.fastq.gz' %}
     {% if fastq_path_r2 %}
-    <a class="btn btn-primary" href="{{ fastq_path_r2 }}" role="button">FASTQ R2</a>
+    <a class="btn btn-primary" href="{{ url_for('download', path=fastq_path_r2) }}" role="button">FASTQ R2</a>
     {% else %}
-    <a class="btn btn-secondary disabled" href="{{ fastq_path_r2 }}" role="button">FASTQ R2</a>
+    <a class="btn btn-secondary disabled" href="{{ url_for('download', path=fastq_path_r2) }}" role="button">FASTQ R2</a>
     {% endif %}
 
+    {% set bam_path = run_id + '/' + sample_id + '/' + sample_id + '.dedup.bam' %}
     {% if bam_path %}
-    <a class="btn btn-primary" href="{{ bam_path }}" role="button">BAM</a>
+    <a class="btn btn-primary" href="{{ url_for('download', path=bam_path) }}" role="button">BAM</a>
     {% else %}
-    <a class="btn btn-secondary disabled" href="{{ bam_path }}" role="button">BAM</a>
+    <a class="btn btn-secondary disabled" href="{{ url_for('download', path=bam_path) }}" role="button">BAM</a>
     {% endif %}
 
+    {% set vcf_path = run_id + '/' + sample_id + '/' + sample_id + '.vcf' %}
     {% if vcf_path %}
-    <a class="btn btn-primary" href="{{ vcf_path }}" role="button">VCF</a>
+    <a class="btn btn-primary" href="{{ url_for('download', path=vcf_path) }}" role="button">VCF</a>
     {% else %}
-    <a class="btn btn-secondary disabled" href="{{ vcf_path }}" role="button">VCF</a>
+    <a class="btn btn-secondary disabled" href="{{ url_for('download', path=vcf_path) }}" role="button">VCF</a>
     {% endif %}
 </div>
 <div class="div-margin">
