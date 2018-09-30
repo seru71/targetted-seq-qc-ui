@@ -63,7 +63,7 @@ def specific_run(run_id):
 
     df = data_preparation.prepare_mean_columns_df(mean_cols_df)
     df.fillna(-1, inplace=True)
-    data['coverage_sample_list'] = df.values.tolist()
+    data['coverage_sample_list'] = df.values.tolist()[:100]
 
     return render_template('run.html', **data)
 
@@ -103,7 +103,7 @@ def specific_sample(run_id, sample_id):
 
     data['coverage_sample_summary'] = get_coverage_sample_summary_table(run_id, sample_id)
     if pp.check_existence(pp.get_sample_variations_path(run_id, sample_id), system_path=False):
-        data['sample_variations'] = data_preparation.get_variations_sample_df(run_id, sample_id, True).values.tolist()
+        data['sample_variations'] = data_preparation.get_variations_sample_df(run_id, sample_id, True).values.tolist()[:100]
     else:
         data['sample_variations'] = False
 
@@ -113,7 +113,7 @@ def specific_sample(run_id, sample_id):
     df = data_preparation.prepare_mean_columns_df(coverage_sample_gene_summary)
     df.fillna(-1, inplace=True)
 
-    data['coverage_sample_list'] = df.values.tolist()
+    data['coverage_sample_list'] = df.values.tolist()[:100]
 
     return render_template('sample.html', **data)
 
