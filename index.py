@@ -61,24 +61,11 @@ def specific_run(run_id):
             'graphJSON': graphJSON,
             'ids': ids,
             'variants': variants if variants else False,
-            'variants_annotations': variants_annotations_df if variants_annotations_df is False else True,
-            'genes': ['HNF1B', 'HNF1A', 'HNF4A']}
-
-    df = data_preparation.get_gene_coverage_df(mean_cols_df, data['genes'])
-    data['selected_genes_df'] = df.to_html(classes='table table-sm table-hover', index=False)
+            'variants_annotations': variants_annotations_df if variants_annotations_df is False else True}
 
     df = data_preparation.prepare_mean_columns_df(mean_cols_df)
     df.fillna(-1, inplace=True)
     data['coverage_sample_list'] = df.values.tolist()
-
-    if request.method == 'POST' and request.form.get('gene_names'):
-        try:
-            data['genes'] = data_preparation.get_genes_from_request(request)
-            df = data_preparation.get_gene_coverage_df(mean_cols_df, data['genes'])
-            data['selected_genes_df'] = df.to_html(classes='table table-sm table-hover', index=False)
-        except Exception as e:
-            print(e)
-            pass
 
     return render_template('run.html', **data)
 
