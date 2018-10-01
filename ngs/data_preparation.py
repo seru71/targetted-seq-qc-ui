@@ -96,7 +96,7 @@ def get_variations_sample_df(run_id, sample_id, save_pickle=False):
 
     pickle_path = path_join(sample_folder_path, f'{sample_id}.sample_variants.pkl')
 
-    if paths_processing.check_existence(pickle_path, system_path=True):
+    if paths_processing.check_existence(pickle_path):
         return pd.read_pickle(pickle_path)[important_columns]
 
     lines = read_data(path)
