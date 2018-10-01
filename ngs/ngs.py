@@ -36,7 +36,7 @@ def specific_run(run_id):
 
     # variants annotations
     path = pp.get_annotated_variants_stats_path(run_id)
-    if pp.check_existence(path, system_path=True):
+    if pp.check_existence(path):
         variants_annotations_df = pd.read_csv(path, delimiter='\t')
     else:
         variants_annotations_df = False
@@ -107,7 +107,7 @@ def specific_sample(run_id, sample_id):
     data.update(links_to_external_download_data_and_reports(run_id, sample_id))
 
     data['coverage_sample_summary'] = get_coverage_sample_summary_table(run_id, sample_id)
-    if pp.check_existence(pp.get_sample_variations_path(run_id, sample_id), system_path=False):
+    if pp.check_existence(pp.get_sample_variations_path(run_id, sample_id)):
         data['sample_variations'] = data_preparation.get_variations_sample_df(run_id, sample_id, True).values.tolist()[:100]
     else:
         data['sample_variations'] = False
@@ -133,17 +133,15 @@ def links_to_external_download_data_and_reports(run_id, sample_id):
     data = {}
 
     # download files
-    fastq_path_r1, fastq_path_r2 = pp.get_fastq_paths(run_id, sample_id)
-
-    data['fastq_path_r1'] = pp.get_url_for(fastq_path_r1)
-    data['fastq_path_r2'] = pp.get_url_for(fastq_path_r2)
-    data['bam_path'] = pp.get_url_for(pp.get_bam_path(run_id, sample_id))
-    data['vcf_path'] = pp.get_url_for(pp.get_vcf_path(run_id, sample_id))
+    data['fastq_path_r1'] = pp.get_fastq_r1_download_path(run_id, sample_id).replace(os.sep, '/')
+    data['fastq_path_r2'] = pp.get_fastq_r2_download_path(run_id, sample_id).replace(os.sep, '/')
+    data['bam_path'] = pp.get_bam_download_path(run_id, sample_id).replace(os.sep, '/')
+    data['vcf_path'] = pp.get_vcf_download_path(run_id, sample_id).replace(os.sep, '/')
 
     # reports
-    data['fq1_fastqc'] = pp.get_url_for(pp.get_fq_fastqc_path(run_id, sample_id, 1))
-    data['fq2_fastqc'] = pp.get_url_for(pp.get_fq_fastqc_path(run_id, sample_id, 2))
-    data['R1_001_fastqc'] = pp.get_url_for(pp.get_fastqc_report_path(run_id, sample_id, 1))
-    data['R2_001_fastqc'] = pp.get_url_for(pp.get_fastqc_report_path(run_id, sample_id, 2))
+    data['fq1_fastqc'] = pp.get_fastq_fq1_download_path(run_id, sample_id).replace(os.sep, '/')
+    data['fq2_fastqc'] = pp.get_fastq_fq2_download_path(run_id, sample_id).replace(os.sep, '/')
+    data['R1_001_fastqc'] = pp.get_fastqc_report_path(run_id, sample_id, 1).replace(os.sep, '/')
+    data['R2_001_fastqc'] = pp.get_fastqc_report_path(run_id, sample_id, 2).replace(os.sep, '/')
 
     return data
