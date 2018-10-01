@@ -63,7 +63,7 @@ def specific_run(run_id):
 
     df = data_preparation.prepare_mean_columns_df(mean_cols_df)
     df.fillna(-1, inplace=True)
-    data['coverage_sample_list'] = df.values.tolist()[:100]
+    data['coverage_sample_list'] = df.round(2).values.tolist()[:100]
 
     return render_template('run.html', **data)
 
