@@ -232,9 +232,6 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
-# Data folder
-data/
-
 # Pickle files
 *.pkl
 # End of https://www.gitignore.io/api/linux,python,windows,pycharm+all,jupyternotebook
