@@ -81,7 +81,7 @@ def samples_paths(runs):
             return False
 
     for run_id in runs:
-        run_path = os.path.join(DATA_FOLDER, run_id)
+        run_path = pp.get_run_path(run_id)
         samples[run_id] = ([(run_id, sample_id) for sample_id in os.listdir(run_path) if valid_sample(sample_id)])
 
     return samples
@@ -98,7 +98,7 @@ def samples():
 def specific_sample(run_id, sample_id):
     data = {'run_id': run_id,
             'sample_id': sample_id,
-            'samples': samples_paths(os.listdir(DATA_FOLDER))}
+            'samples': samples_paths(pp.get_all_runs_names())}
 
     # update dict with links to download files and reports
     data.update(links_to_external_download_data_and_reports(run_id, sample_id))
