@@ -1,6 +1,6 @@
 import pandas as pd
 
-from ngs import paths_processing
+import path_processing
 
 from os.path import join as path_join
 
@@ -9,7 +9,7 @@ def get_summary(run_id):
     columns = ['sample_id', 'total', 'mean', '%_bases_above_5', '%_bases_above_10', '%_bases_above_20']
     new_columns = ['Sample ID', 'Total', 'Mean', 'Above 5%', 'Above 10%', 'Above 20%']
 
-    summary_path = paths_processing.get_sample_coverage_path(run_id)
+    summary_path = path_processing.get_sample_coverage_path(run_id)
 
     sample_summary = pd.read_csv(summary_path, delimiter='\t', index_col=False, usecols=columns)
     sample_summary.rename(columns=dict(zip(columns, new_columns)), inplace=True)
@@ -32,7 +32,7 @@ def prepare_mean_columns_df(df):
 
 
 def get_gene_summary(run_id):
-    summary_path = paths_processing.get_sample_gene_coverage_path(run_id)
+    summary_path = path_processing.get_sample_gene_coverage_path(run_id)
 
     sample_gene_summary = pd.read_csv(summary_path, delimiter='\t', index_col=False)
     return sample_gene_summary
@@ -49,9 +49,9 @@ def extract_data_from_multisample_stats(path):
 
 
 def get_multisample_stats_df(run_id):
-    path = paths_processing.get_multisample_vcf_stats_path(run_id)
+    path = path_processing.get_multisample_vcf_stats_path(run_id)
 
-    if not paths_processing.check_existence(path):
+    if not path_processing.check_existence(path):
         return False, False
 
     lines = extract_data_from_multisample_stats(path)
@@ -90,13 +90,13 @@ def get_variations_sample_df(run_id, sample_id, save_pickle=False):
 
     important_columns = ['#CHROM', 'POS', 'REF', 'ALT', 'QUAL', 'GT', 'AD', 'DP']
 
-    path = paths_processing.get_sample_variations_path(run_id, sample_id)
+    path = path_processing.get_sample_variations_path(run_id, sample_id)
 
-    sample_folder_path = paths_processing.get_sample_path(run_id, sample_id)
+    sample_folder_path = path_processing.get_sample_path(run_id, sample_id)
 
     pickle_path = path_join(sample_folder_path, f'{sample_id}.sample_variants.pkl')
 
-    if paths_processing.check_existence(pickle_path):
+    if path_processing.check_existence(pickle_path):
         return pd.read_pickle(pickle_path)[important_columns]
 
     lines = read_data(path)
