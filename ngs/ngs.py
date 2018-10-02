@@ -4,10 +4,12 @@ import pandas as pd
 import json
 import plotly
 
-from ngs import paths_processing as pp, data_preparation
+from ngs import data_preparation
+from flask import Flask, render_template, send_from_directory
 
 from ngs.graphs import *
-from flask import Flask, render_template, send_from_directory
+
+import path_processing as pp
 
 DATA_FOLDER = os.path.join(*['ngs', 'data', 'runs'])
 DATA_SUMMARY_FOLDER = 'qc'
