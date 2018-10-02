@@ -1,14 +1,13 @@
 import os
-import pandas as pd
-
 import json
 import plotly
 
-from ngs import data_preparation
+import pandas as pd
 from flask import Flask, render_template, send_from_directory
 
 from ngs.graphs import *
 
+import data_preparation
 import path_processing as pp
 
 DATA_FOLDER = os.path.join(*['ngs', 'data', 'runs'])
@@ -22,7 +21,7 @@ server = Flask(__name__)
 @server.route("/")
 @server.route("/runs")
 def runs():
-    runs = os.listdir(DATA_FOLDER)
+    runs = pp.get_all_runs_names()
     return render_template('runs.html', runs=runs)
 
 
@@ -31,7 +30,7 @@ def specific_run(run_id):
     sample_summary_table = data_preparation.get_summary(run_id)
     mean_cols_df = data_preparation.get_gene_summary(run_id)
 
-    runs = os.listdir(DATA_FOLDER)
+    runs = pp.get_all_runs_names()
 
     # presenting plot
     variants, variants_df = data_preparation.get_multisample_stats_df(run_id)
@@ -52,11 +51,8 @@ def specific_run(run_id):
     graphJSON = json.dumps(graphs, cls=plotly.utils.PlotlyJSONEncoder)
     ids = ['graph-{}'.format(i) for i, _ in enumerate(graphs)]
 
-    unique_genes = set([x.split('_')[0] for x in mean_cols_df.Gene])
-
     data = {'run_id': run_id,
             'sample_summary_table': data_preparation.prepare_sample_summary_html_table(sample_summary_table, run_id),
-            'unique_genes': unique_genes,
             'runs': runs,
             'graphJSON': graphJSON,
             'ids': ids,
@@ -93,7 +89,7 @@ def samples_paths(runs):
 
 @server.route("/samples")
 def samples():
-    runs = os.listdir(DATA_FOLDER)
+    runs = pp.get_all_runs_names()
     samples = samples_paths(runs)
 
     return render_template('samples.html', samples=samples)
@@ -108,7 +104,7 @@ def specific_sample(run_id, sample_id):
     # update dict with links to download files and reports
     data.update(links_to_external_download_data_and_reports(run_id, sample_id))
 
-    data['coverage_sample_summary'] = get_coverage_sample_summary_table(run_id, sample_id)
+    data['coverage_sample_summary'] = data_preparation.get_coverage_sample_summary_table(run_id, sample_id)
     if pp.check_existence(pp.get_sample_variations_path(run_id, sample_id)):
         data['sample_variations'] = data_preparation.get_variations_sample_df(run_id, sample_id, True).values.tolist()[:100]
     else:
@@ -123,12 +119,6 @@ def specific_sample(run_id, sample_id):
     data['coverage_sample_list'] = df.values.tolist()[:100]
 
     return render_template('sample.html', **data)
-
-
-def get_coverage_sample_summary_table(run_id, sample_id):
-    path = pp.get_coverage_sample_summary_path(run_id, sample_id)
-    coverage_sample_summary = pd.read_csv(path, delimiter='\t', index_col=False).dropna()
-    return coverage_sample_summary.to_html(classes='table table-sm table-hover', index=False)
 
 
 def links_to_external_download_data_and_reports(run_id, sample_id):
