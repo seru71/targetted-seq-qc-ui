@@ -91,7 +91,6 @@ def samples_paths(runs):
 def samples():
     runs = pp.get_all_runs_names()
     samples = samples_paths(runs)
-
     return render_template('samples.html', samples=samples)
 
 
