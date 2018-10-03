@@ -93,28 +93,37 @@ def samples():
     return render_template('samples/samples.html', samples=samples)
 
 
-@server.route("/runs/<run_id>/<sample_id>", methods=['GET', 'POST'])
+@server.route("/runs/<run_id>/<sample_id>", methods=['GET'])
 def specific_sample(run_id, sample_id):
+    if run_id not in pp.get_all_runs_names() or sample_id not in pp.get_samples_from_run_name(run_id):
+        return redirect(url_for('samples'))
+
     data = {'run_id': run_id,
             'sample_id': sample_id,
-            'samples': samples_paths(pp.get_all_runs_names())}
+            'samples': samples_paths(pp.get_all_runs_names()),
+            'gene_coverage_exists': True,
+            'sample_variants_exists': True,
+            'coverage_sample_summary_exists': True}
+
+    if pp.check_existence(pp.get_coverage_sample_summary_path(run_id, sample_id)):
+        data['coverage_sample_summary'] = data_preparation.get_coverage_sample_summary_table(run_id, sample_id)
+    else:
+        data['coverage_sample_summary_exists'] = False
+
+    # gene coverage
+    if pp.check_existence(pp.get_sample_gene_summary_path(run_id, sample_id)):
+        data['coverage_sample_list'] = data_preparation.get_gene_coverage_sample_summary(run_id, sample_id).values.tolist()[:100]
+    else:
+        data['gene_coverage_exists'] = False
+
+    # sample variants
+    if pp.check_existence(pp.get_sample_variations_path(run_id, sample_id)):
+        data['sample_variations'] = data_preparation.get_variations_sample_df(run_id, sample_id, True).values.tolist()[:110]
+    else:
+        data['sample_variants_exists'] = False
 
     # update dict with links to download files and reports
     data.update(links_to_external_download_data_and_reports(run_id, sample_id))
-
-    data['coverage_sample_summary'] = data_preparation.get_coverage_sample_summary_table(run_id, sample_id)
-    if pp.check_existence(pp.get_sample_variations_path(run_id, sample_id)):
-        data['sample_variations'] = data_preparation.get_variations_sample_df(run_id, sample_id, True).values.tolist()[:100]
-    else:
-        data['sample_variations'] = False
-
-    path = pp.get_sample_gene_summary_path(run_id, sample_id)
-    coverage_sample_gene_summary = pd.read_csv(path, delimiter='\t', index_col=False)
-
-    df = data_preparation.prepare_mean_columns_df(coverage_sample_gene_summary)
-    df.fillna(-1, inplace=True)
-
-    data['coverage_sample_list'] = df.values.tolist()[:100]
 
     return render_template('samples/sample.html', **data)
 
