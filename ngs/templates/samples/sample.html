@@ -3,7 +3,13 @@
 {% block content %}
 <h3><b>Run ID:</b> <a href="{{ url_for('.specific_run', run_id=run_id) }}">{{ run_id }}</a></h3>
 <h3><b>Sample ID:</b> {{ sample_id }}</h3>
-{{ coverage_sample_summary | safe }}
+{% if coverage_sample_summary_exists %}
+    {{ coverage_sample_summary | safe }}
+{% else %}
+<div class="alert alert-info" role="alert">
+  There are no sample summary data available.
+</div>
+{% endif %}
 
 <div class="div-margin">
     <h3>Download:</h3>
@@ -62,18 +68,18 @@
 
 <div class="div-margin">
     <h3>Gene coverage:</h3>
-    {% if coverage_sample_list %}
+    {% if gene_coverage_exists %}
         <table id="coverage_sample" class="table table-sm table-hover" width="100%"></table>
     {% else %}
     <div class="alert alert-info" role="alert">
-      There are no data available.
+      There are no gene coverage data available.
     </div>
     {% endif %}
 </div>
 
 <div class="div-margin">
     <h3>Sample Variants</h3>
-    {% if sample_variations %}
+    {% if sample_variants_exists %}
         <table id="sample_variants" class="table table-sm table-hover" width="100%"></table>
     {% else %}
     <div class="alert alert-info" role="alert">

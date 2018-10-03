@@ -9,6 +9,18 @@ def get_sample_path(run_id, sample_id):
     return os.path.join(get_run_path(run_id), sample_id)
 
 
+def get_samples_from_run_name(run_id):
+    def valid_sample(sample_name):
+        try:
+            return True if int(sample_name) else False
+        except ValueError:
+            return False
+
+    run_path = get_run_path(run_id)
+
+    return [sample_id for sample_id in os.listdir(run_path) if valid_sample(sample_id)]
+
+
 # tables and graphs
 def get_sample_variations_path(run_id, sample_id):
     return os.path.join(get_sample_path(run_id, sample_id), '{}.vcf'.format(sample_id))

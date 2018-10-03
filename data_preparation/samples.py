@@ -1,6 +1,7 @@
 import pandas as pd
 
 import path_processing
+import data_preparation
 
 from os.path import join as path_join
 
@@ -57,3 +58,14 @@ def get_variations_sample_df(run_id, sample_id, save_pickle=False):
         df.to_pickle(path_join(sample_folder_path, f'{sample_id}.sample_variants.pkl'))
 
     return data[important_columns]
+
+
+def get_gene_coverage_sample_summary(run_id, sample_id):
+    gene_coverage_path = path_processing.get_sample_gene_summary_path(run_id, sample_id)
+
+    coverage_sample_gene_summary = pd.read_csv(gene_coverage_path, delimiter='\t', index_col=False)
+
+    df = data_preparation.prepare_mean_columns_df(coverage_sample_gene_summary)
+    df.fillna(-1, inplace=True)
+
+    return df
