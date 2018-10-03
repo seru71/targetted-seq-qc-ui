@@ -3,7 +3,7 @@ import json
 import plotly
 
 import pandas as pd
-from flask import Flask, render_template, send_from_directory
+from flask import Flask, render_template, send_from_directory, redirect, url_for
 
 from ngs.graphs import *
 
@@ -21,12 +21,15 @@ def runs():
     return render_template('runs/runs.html', runs=runs)
 
 
-@server.route("/runs/<run_id>", methods=['GET', 'POST'])
+@server.route("/runs/<run_id>", methods=['GET'])
 def specific_run(run_id):
+    runs = pp.get_all_runs_names()
+
+    if run_id not in runs:
+        return redirect(url_for('runs'))
+
     sample_summary_table = data_preparation.get_summary(run_id)
     mean_cols_df = data_preparation.get_gene_summary(run_id)
-
-    runs = pp.get_all_runs_names()
 
     # presenting plot
     variants, variants_df = data_preparation.get_multisample_stats_df(run_id)
@@ -132,3 +135,8 @@ def links_to_external_download_data_and_reports(run_id, sample_id):
     data['R2_001_fastqc'] = pp.get_fastqc_report_path(run_id, sample_id, 2).replace(os.sep, '/')
 
     return data
+
+
+@server.errorhandler(404)
+def page_not_found(error):
+    return render_template('page_not_found.html'), 404
