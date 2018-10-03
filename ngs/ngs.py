@@ -10,10 +10,6 @@ from ngs.graphs import *
 import data_preparation
 import path_processing as pp
 
-DATA_FOLDER = os.path.join(*['ngs', 'data', 'runs'])
-DATA_SUMMARY_FOLDER = 'qc'
-FASTQ = 'fastqs'
-READ_QC = 'read_qc'
 
 server = Flask(__name__)
 
@@ -22,7 +18,7 @@ server = Flask(__name__)
 @server.route("/runs")
 def runs():
     runs = pp.get_all_runs_names()
-    return render_template('runs.html', runs=runs)
+    return render_template('runs/runs.html', runs=runs)
 
 
 @server.route("/runs/<run_id>", methods=['GET', 'POST'])
@@ -63,7 +59,7 @@ def specific_run(run_id):
     df.fillna(-1, inplace=True)
     data['coverage_sample_list'] = df.round(2).values.tolist()[:100]
 
-    return render_template('run.html', **data)
+    return render_template('runs/run.html', **data)
 
 
 @server.route('/download/<path:path>')
@@ -91,7 +87,7 @@ def samples_paths(runs):
 def samples():
     runs = pp.get_all_runs_names()
     samples = samples_paths(runs)
-    return render_template('samples.html', samples=samples)
+    return render_template('samples/samples.html', samples=samples)
 
 
 @server.route("/runs/<run_id>/<sample_id>", methods=['GET', 'POST'])
@@ -117,7 +113,7 @@ def specific_sample(run_id, sample_id):
 
     data['coverage_sample_list'] = df.values.tolist()[:100]
 
-    return render_template('sample.html', **data)
+    return render_template('samples/sample.html', **data)
 
 
 def links_to_external_download_data_and_reports(run_id, sample_id):
