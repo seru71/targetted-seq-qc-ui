@@ -71,3 +71,19 @@ def get_bam_download_path(run_id, sample_id):
 
 def get_vcf_download_path(run_id, sample_id):
     return os.path.join(run_id, sample_id, '{}.vcf'.format(sample_id))
+
+
+def samples_paths(runs):
+    samples = {}
+
+    def valid_sample(sample_name):
+        try:
+            return True if int(sample_name) else False
+        except Exception:
+            return False
+
+    for run_id in runs:
+        run_path = pp.get_run_path(run_id)
+        samples[run_id] = ([(run_id, sample_id) for sample_id in os.listdir(run_path) if valid_sample(sample_id)])
+
+    return samples
