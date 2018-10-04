@@ -105,45 +105,15 @@ def specific_sample(run_id, sample_id):
             'sample_variants_exists': True,
             'coverage_sample_summary_exists': True}
 
-    if pp.check_existence(pp.get_coverage_sample_summary_path(run_id, sample_id)):
-        data['coverage_sample_summary'] = data_preparation.get_coverage_sample_summary_table(run_id, sample_id)
-    else:
-        data['coverage_sample_summary_exists'] = False
-
-    # gene coverage
-    if pp.check_existence(pp.get_sample_gene_summary_path(run_id, sample_id)):
-        data['coverage_sample_list'] = data_preparation.get_gene_coverage_sample_summary(run_id, sample_id).values.tolist()[:100]
-    else:
-        data['gene_coverage_exists'] = False
-
-    # sample variants
-    if pp.check_existence(pp.get_sample_variations_path(run_id, sample_id)):
-        data['sample_variations'] = data_preparation.get_variations_sample_df(run_id, sample_id, True).values.tolist()[:110]
-    else:
-        data['sample_variants_exists'] = False
+    # update data dict with tables and other data information
+    data.update(data_preparation.prepare_tables_for_sample_page(run_id, sample_id))
 
     # update dict with links to download files and reports
-    data.update(links_to_external_download_data_and_reports(run_id, sample_id))
+    data.update(data_preparation.links_to_external_download_data_and_reports(run_id, sample_id))
+
+    print(data['coverage_sample_summary'])
 
     return render_template('samples/sample.html', **data)
-
-
-def links_to_external_download_data_and_reports(run_id, sample_id):
-    data = {}
-
-    # download files
-    data['fastq_path_r1'] = pp.get_fastq_r1_download_path(run_id, sample_id).replace(os.sep, '/')
-    data['fastq_path_r2'] = pp.get_fastq_r2_download_path(run_id, sample_id).replace(os.sep, '/')
-    data['bam_path'] = pp.get_bam_download_path(run_id, sample_id).replace(os.sep, '/')
-    data['vcf_path'] = pp.get_vcf_download_path(run_id, sample_id).replace(os.sep, '/')
-
-    # reports
-    data['fq1_fastqc'] = pp.get_fastq_fq1_download_path(run_id, sample_id).replace(os.sep, '/')
-    data['fq2_fastqc'] = pp.get_fastq_fq2_download_path(run_id, sample_id).replace(os.sep, '/')
-    data['R1_001_fastqc'] = pp.get_fastqc_report_path(run_id, sample_id, 1).replace(os.sep, '/')
-    data['R2_001_fastqc'] = pp.get_fastqc_report_path(run_id, sample_id, 2).replace(os.sep, '/')
-
-    return data
 
 
 @server.errorhandler(404)
