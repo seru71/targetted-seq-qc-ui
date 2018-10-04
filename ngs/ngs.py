@@ -1,4 +1,3 @@
-import os
 import json
 import plotly
 
@@ -70,26 +69,10 @@ def download(path):
     return send_from_directory('data/runs/', path)
 
 
-def samples_paths(runs):
-    samples = {}
-
-    def valid_sample(sample_name):
-        try:
-            return True if int(sample_name) else False
-        except Exception:
-            return False
-
-    for run_id in runs:
-        run_path = pp.get_run_path(run_id)
-        samples[run_id] = ([(run_id, sample_id) for sample_id in os.listdir(run_path) if valid_sample(sample_id)])
-
-    return samples
-
-
 @server.route("/samples")
 def samples():
     runs = pp.get_all_runs_names()
-    samples = samples_paths(runs)
+    samples = pp.samples_paths(runs)
     return render_template('samples/samples.html', samples=samples)
 
 
@@ -100,7 +83,7 @@ def specific_sample(run_id, sample_id):
 
     data = {'run_id': run_id,
             'sample_id': sample_id,
-            'samples': samples_paths(pp.get_all_runs_names()),
+            'samples': pp.samples_paths(pp.get_all_runs_names()),
             'gene_coverage_exists': True,
             'sample_variants_exists': True,
             'coverage_sample_summary_exists': True}
@@ -110,8 +93,6 @@ def specific_sample(run_id, sample_id):
 
     # update dict with links to download files and reports
     data.update(data_preparation.links_to_external_download_data_and_reports(run_id, sample_id))
-
-    print(data['coverage_sample_summary'])
 
     return render_template('samples/sample.html', **data)
 
