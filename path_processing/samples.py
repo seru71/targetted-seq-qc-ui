@@ -83,7 +83,7 @@ def samples_paths(runs):
             return False
 
     for run_id in runs:
-        run_path = pp.get_run_path(run_id)
+        run_path = get_run_path(run_id)
         samples[run_id] = ([(run_id, sample_id) for sample_id in os.listdir(run_path) if valid_sample(sample_id)])
 
     return samples
