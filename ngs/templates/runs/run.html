@@ -2,20 +2,33 @@
 
 {% block content %}
 <h3><b>Run ID:</b> {{ run_id }}</h3>
+
 <h3>Graphical representation</h3>
 <div id={{ ids[0] }}></div>
-<h3>Target coverage</h3>
-{{ sample_summary_table | safe }}
 
+<h3>Target coverage</h3>
+{% if sample_summary_table %}
+    {{ sample_summary_table | safe }}
+{% else %}
+    <div class="alert alert-info" role="alert">
+      There is no target coverage table available.
+    </div>
+{% endif %}
 
 <h3>Gene coverage</h3>
+{% if coverage_sample_list %}
 <table id="coverage_sample" class="table table-sm table-hover" width="100%"></table>
+{% else %}
+<div class="alert alert-info" role="alert">
+  There are no gene coverage data available.
+</div>
+{% endif %}
 
 
 <h3>Variants</h3>
 {% if variants %}
     <div id={{ ids[1] }}></div>
-    {{ variants|safe }}
+    {{ variants | safe }}
 {% else %}
 <div class="alert alert-info" role="alert">
   There are no variants available.

@@ -1,6 +1,7 @@
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 
+
 WEBSITE = 'http://127.0.0.1:5000/'
 
 driver = webdriver.Chrome(executable_path='C:\chrome_driver\chromedriver.exe')
