@@ -27,11 +27,19 @@ def specific_run(run_id):
     if run_id not in runs:
         return redirect(url_for('runs'))
 
-    sample_summary_table = data_preparation.get_summary(run_id)
-    mean_cols_df = data_preparation.get_gene_summary(run_id)
+    # target coverage
+    path = pp.get_sample_coverage_path(run_id)
+    if pp.check_existence(path):
+        sample_summary_table = data_preparation.get_summary(run_id)
+    else:
+        sample_summary_table = False
 
     # presenting plot
-    variants, variants_df = data_preparation.get_multisample_stats_df(run_id)
+    path = pp.get_multisample_vcf_stats_path(run_id)
+    if pp.check_existence(path):
+        variants, variants_df = data_preparation.get_multisample_stats_df(run_id)
+    else:
+        variants, variants_df = False, False
 
     # variants annotations
     path = pp.get_annotated_variants_stats_path(run_id)
@@ -49,17 +57,24 @@ def specific_run(run_id):
     graphJSON = json.dumps(graphs, cls=plotly.utils.PlotlyJSONEncoder)
     ids = ['graph-{}'.format(i) for i, _ in enumerate(graphs)]
 
-    data = {'run_id': run_id,
-            'sample_summary_table': data_preparation.prepare_sample_summary_html_table(sample_summary_table, run_id),
-            'runs': runs,
+    data = {'sample_summary_table': data_preparation.prepare_sample_summary_html_table(sample_summary_table, run_id),
             'graphJSON': graphJSON,
             'ids': ids,
             'variants': variants if variants else False,
-            'variants_annotations': variants_annotations_df if variants_annotations_df is False else True}
+            'variants_annotations': variants_annotations_df if variants_annotations_df is False else True,
+            'coverage_sample_list': False,
+            'run_id': run_id,
+            'runs': runs,
+            }
 
-    df = data_preparation.prepare_mean_columns_df(mean_cols_df)
-    df.fillna(-1, inplace=True)
-    data['coverage_sample_list'] = df.round(2).values.tolist()[:100]
+    # gene coverage
+    summary_path = pp.get_sample_gene_coverage_path(run_id)
+    if pp.check_existence(summary_path):
+        data['coverage_sample_list_exists'] = True
+        mean_cols_df = data_preparation.get_gene_summary(run_id)
+        df = data_preparation.prepare_mean_columns_df(mean_cols_df)
+        df.fillna(-1, inplace=True)
+        data['coverage_sample_list'] = df.round(2).values.tolist()[:100]
 
     return render_template('runs/run.html', **data)
 

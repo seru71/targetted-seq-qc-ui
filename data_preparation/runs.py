@@ -34,6 +34,7 @@ def extract_data_from_multisample_stats(path):
     return lines
 
 
+# variants
 def get_multisample_stats_df(run_id):
     path = path_processing.get_multisample_vcf_stats_path(run_id)
 
