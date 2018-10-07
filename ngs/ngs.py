@@ -1,5 +1,6 @@
 import json
 import plotly
+import logging
 
 import pandas as pd
 from flask import Flask, render_template, send_from_directory, redirect, url_for
@@ -12,11 +13,23 @@ import path_processing as pp
 
 server = Flask(__name__)
 
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+
+formatter = logging.Formatter('%(asctime)s:%(name)s:%(funcName)s:%(message)s')
+
+file_handler = logging.FileHandler('logs/ngs.log')
+file_handler.setLevel(logging.INFO)
+file_handler.setFormatter(formatter)
+
+logger.addHandler(file_handler)
+
 
 @server.route("/")
 @server.route("/runs")
 def runs():
     runs = pp.get_all_runs_names()
+    logger.info("Runs page rendered.")
     return render_template('runs/runs.html', runs=runs)
 
 
@@ -25,6 +38,7 @@ def specific_run(run_id):
     runs = pp.get_all_runs_names()
 
     if run_id not in runs:
+        logger.info('Redirected for incorrect run_id {}'.format(run_id))
         return redirect(url_for('runs'))
 
     # target coverage
@@ -76,11 +90,13 @@ def specific_run(run_id):
         df.fillna(-1, inplace=True)
         data['coverage_sample_list'] = df.round(2).values.tolist()[:100]
 
+    logger.info('Specific run_id page rendered correctly. {}'.format(run_id))
     return render_template('runs/run.html', **data)
 
 
 @server.route('/download/<path:path>')
 def download(path):
+    logger.info('Access to file: {}'.format(path))
     return send_from_directory('data/runs/', path)
 
 
@@ -88,12 +104,14 @@ def download(path):
 def samples():
     runs = pp.get_all_runs_names()
     samples = pp.samples_paths(runs)
+    logger.info('Samples page rendered.')
     return render_template('samples/samples.html', samples=samples)
 
 
 @server.route("/runs/<run_id>/<sample_id>", methods=['GET'])
 def specific_sample(run_id, sample_id):
     if run_id not in pp.get_all_runs_names() or sample_id not in pp.get_samples_from_run_name(run_id):
+        logger.info('Invalid sample_id or run_id.')
         return redirect(url_for('samples'))
 
     data = {'run_id': run_id,
@@ -109,9 +127,11 @@ def specific_sample(run_id, sample_id):
     # update dict with links to download files and reports
     data.update(data_preparation.links_to_external_download_data_and_reports(run_id, sample_id))
 
+    logger.info('Specific sample loaded correctly. {} {}'.format(run_id, sample_id))
     return render_template('samples/sample.html', **data)
 
 
 @server.errorhandler(404)
 def page_not_found(error):
+    logger.error('Page not found.')
     return render_template('page_not_found.html'), 404
