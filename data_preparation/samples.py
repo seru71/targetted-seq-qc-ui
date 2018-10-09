@@ -104,8 +104,7 @@ def prepare_tables_for_sample_page(run_id, sample_id):
     if path_processing.check_existence(path_processing.get_sample_gene_summary_path(run_id, sample_id)):
         logger.info(f'Preparing gene coverage sample summary for {run_id} run {sample_id} sample')
         data['coverage_sample_list'] = data_preparation.get_gene_coverage_sample_summary(run_id,
-                                                                                         sample_id).values.tolist()[
-                                       :100]
+                                                                                         sample_id).values.tolist()
     else:
         logger.info(f'There is no gene coverage sample summary for {run_id} run {sample_id} sample')
         data['gene_coverage_exists'] = False
@@ -113,8 +112,7 @@ def prepare_tables_for_sample_page(run_id, sample_id):
     # sample variants
     if path_processing.check_existence(path_processing.get_sample_variations_path(run_id, sample_id)):
         logger.info(f'Preparing variations sample df for {run_id} run {sample_id} sample')
-        data['sample_variations'] = data_preparation.get_variations_sample_df(run_id, sample_id, True).values.tolist()[
-                                    :110]
+        data['sample_variations'] = data_preparation.get_variations_sample_df(run_id, sample_id, True).values.tolist()
     else:
         logger.info(f'There is no variations sample file for {run_id} run {sample_id} sample')
         data['sample_variants_exists'] = False
