@@ -2,8 +2,10 @@ import json
 import plotly
 import logging
 
+from Crypto.Cipher import AES
+
 import pandas as pd
-from flask import Flask, render_template, send_from_directory, redirect, url_for
+from flask import Flask, render_template, send_from_directory, redirect, url_for, jsonify, request
 
 from ngs.graphs import *
 
@@ -135,3 +137,29 @@ def specific_sample(run_id, sample_id):
 def page_not_found(error):
     logger.error('Page not found.')
     return render_template('page_not_found.html'), 404
+
+
+@server.route("/send")
+def send_data():
+    obj = AES.new('29vPczHl70mDqM6xkzhm8WwQS3xlcYJN', AES.MODE_CBC, 'This is an IV456')
+    message = "The answer is no" * 32
+    ciphertext = obj.encrypt(message)
+
+    response = {
+        'data': ciphertext.hex(),
+    }
+
+    return jsonify(response), 200
+
+
+@server.route("/receive", methods=['GET', 'POST'])
+def receive_data():
+    if request.method == 'POST':
+        data = json.loads(request.get_json())
+
+        obj = AES.new('29vPczHl70mDqM6xkzhm8WwQS3xlcYJN', AES.MODE_CBC, 'This is an IV456')
+        hex_data = bytes.fromhex(data['data'])
+        ciphertext = obj.decrypt(hex_data)
+        return ciphertext, 200
+
+    return 'Something', 200
