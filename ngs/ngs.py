@@ -10,6 +10,7 @@ import pandas as pd
 from flask import Flask, render_template, send_from_directory, redirect, url_for, jsonify, request, abort
 
 from ngs.graphs import *
+from data_share.Pad import Pad
 
 import data_preparation
 import path_processing as pp
@@ -165,15 +166,15 @@ def receive_data():
         return obj.decrypt(hex_data).decode()
 
     def encrypt_data(data):
-        # to do data must be a multiple of 16 length
         obj = AES.new(os.environ.get('ENCRYPTION_KEY'), AES.MODE_CBC, 'This is an IV456')
-        ciphertext = obj.encrypt(data)
+        padded = Pad.pad(data.encode())
+        ciphertext = obj.encrypt(padded)
         return ciphertext.hex()
 
     def validate_signature(signature):
         return signature == 'dawid'
 
-    print(encrypt_data('d'*16))
+    print(encrypt_data('dawid'))
 
     if request.method == 'POST':
         data = json.loads(request.get_json())
