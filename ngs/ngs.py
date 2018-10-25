@@ -160,13 +160,20 @@ def send_data():
 @server.route("/data", methods=['GET', 'POST'])
 def receive_data():
     def decrypt_data(data):
-        encryption_key = os.environ.get('ENCRYPTION_KEY')
-        obj = AES.new(encryption_key, AES.MODE_CBC, 'This is an IV456')
+        obj = AES.new(os.environ.get('ENCRYPTION_KEY'), AES.MODE_CBC, 'This is an IV456')
         hex_data = bytes.fromhex(data)
         return obj.decrypt(hex_data).decode()
 
+    def encrypt_data(data):
+        # to do data must be a multiple of 16 length
+        obj = AES.new(os.environ.get('ENCRYPTION_KEY'), AES.MODE_CBC, 'This is an IV456')
+        ciphertext = obj.encrypt(data)
+        return ciphertext.hex()
+
     def validate_signature(signature):
         return signature == 'dawid'
+
+    print(encrypt_data('d'*16))
 
     if request.method == 'POST':
         data = json.loads(request.get_json())
@@ -184,10 +191,3 @@ def receive_data():
     else:
         abort(403)
 
-    # obj = AES.new(encryption_key, AES.MODE_CBC, 'This is an IV456')
-    # message = "The answer is no" * 32
-    #
-    # ciphertext = obj.encrypt(message)
-    # response = {
-    #     'data': ciphertext.hex(),
-    # }
