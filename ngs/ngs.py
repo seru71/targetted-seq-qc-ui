@@ -1,11 +1,13 @@
 import json
 import plotly
 import logging
+import os
+import time
 
 from Crypto.Cipher import AES
 
 import pandas as pd
-from flask import Flask, render_template, send_from_directory, redirect, url_for, jsonify, request
+from flask import Flask, render_template, send_from_directory, redirect, url_for, jsonify, request, abort
 
 from ngs.graphs import *
 
@@ -139,27 +141,53 @@ def page_not_found(error):
     return render_template('page_not_found.html'), 404
 
 
-@server.route("/send")
+@server.route("/sample_data")
 def send_data():
-    obj = AES.new('29vPczHl70mDqM6xkzhm8WwQS3xlcYJN', AES.MODE_CBC, 'This is an IV456')
-    message = "The answer is no" * 32
-    ciphertext = obj.encrypt(message)
+    encryption_key = os.environ.get('ENCRYPTION_KEY')
+    obj = AES.new(encryption_key, AES.MODE_CBC, 'This is an IV456')
 
+    message = "The answer is no " * 32
+
+    ciphertext = obj.encrypt(message)
     response = {
         'data': ciphertext.hex(),
+        "signature": "dawid",
     }
 
     return jsonify(response), 200
 
 
-@server.route("/receive", methods=['GET', 'POST'])
+@server.route("/data", methods=['GET', 'POST'])
 def receive_data():
+    def decrypt_data(data):
+        encryption_key = os.environ.get('ENCRYPTION_KEY')
+        obj = AES.new(encryption_key, AES.MODE_CBC, 'This is an IV456')
+        hex_data = bytes.fromhex(data)
+        return obj.decrypt(hex_data).decode()
+
+    def validate_signature(signature):
+        return signature == 'dawid'
+
     if request.method == 'POST':
         data = json.loads(request.get_json())
+        if not validate_signature(data['signature']):
+            logger.info("Invalid signature.")
+            abort(403, "Invalid signature.")
 
-        obj = AES.new('29vPczHl70mDqM6xkzhm8WwQS3xlcYJN', AES.MODE_CBC, 'This is an IV456')
-        hex_data = bytes.fromhex(data['data'])
-        ciphertext = obj.decrypt(hex_data)
-        return ciphertext, 200
+        # do something with
+        decoded_information = decrypt_data(data['data'])
+        with open(os.path.join('data_acquisition', '{}.txt'.format(time.time())), 'w') as incoming_data_file:
+            incoming_data_file.write(decoded_information)
+            logger.info("Data saved.")
 
-    return 'Something', 200
+        return "Successful data acquisition", 200
+    else:
+        abort(403)
+
+    # obj = AES.new(encryption_key, AES.MODE_CBC, 'This is an IV456')
+    # message = "The answer is no" * 32
+    #
+    # ciphertext = obj.encrypt(message)
+    # response = {
+    #     'data': ciphertext.hex(),
+    # }
