@@ -5,7 +5,7 @@ class Pad(object):
         assert isinstance(data, bytes)
         length = base - (len(data) % base)
 
-        return data + bytes([length])*length
+        return data + bytes([length]) * length
 
     @staticmethod
     def unpad(data):

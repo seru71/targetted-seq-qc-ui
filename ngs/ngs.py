@@ -11,6 +11,7 @@ from flask import Flask, render_template, send_from_directory, redirect, url_for
 
 from ngs.graphs import *
 from data_share.Pad import Pad
+from data_share.DataShare import DataShare
 
 import data_preparation
 import path_processing as pp
@@ -161,30 +162,13 @@ def send_data():
 
 @server.route("/data", methods=['GET', 'POST'])
 def receive_data():
-    def decrypt_data(data):
-        obj = AES.new(os.environ.get('ENCRYPTION_KEY'), AES.MODE_CBC, 'This is an IV456')
-        bytes_data = bytes.fromhex(data)
-        return Pad.unpad(obj.decrypt(bytes_data)).decode()
-
-    def encrypt_data(data):
-        obj = AES.new(os.environ.get('ENCRYPTION_KEY'), AES.MODE_CBC, 'This is an IV456')
-        padded = Pad.pad(data.encode())
-        ciphertext = obj.encrypt(padded)
-        return ciphertext.hex()
-
-    def validate_signature(signature):
-        return signature == 'dawid'
-
-    print(encrypt_data('dawid'))
-
     if request.method == 'POST':
         data = json.loads(request.get_json())
-        if not validate_signature(data['signature']):
+        if not DataShare.validate_signature(data['signature']):
             logger.info("Invalid signature.")
             abort(403, "Invalid signature.")
 
-        # do something with
-        decoded_information = decrypt_data(data['data'])
+        decoded_information = DataShare.decrypt_data(data['data'])
         print(decoded_information)
         with open(os.path.join('data_acquisition', '{}.txt'.format(time.time())), 'w') as incoming_data_file:
             incoming_data_file.write(decoded_information)
@@ -194,3 +178,27 @@ def receive_data():
     else:
         abort(403)
 
+
+@server.route('/sample-node', methods=['GET', 'POST'])
+def sample_node():
+    response = {
+        'name': 'Laboratory-Warsaw',
+        'signature': 'dawid',
+        'address': '0.0.0.0',
+    }
+
+    return jsonify(response), 200
+
+
+@server.route('/add-node', methods=['GET', 'POST'])
+def add_node():
+    if request.method == 'POST':
+        data = json.loads(request.get_json())
+        if not DataShare.validate_signature(data['signature']):
+            logger.info('Invalid signature add-node')
+            abort(403, 'Invalid signature.')
+
+        with open(os.path.join('nodes', '{}.json'.format(data['name'])), 'w') as file:
+            json.dump(data, file)
+
+        return 'Success', 200
