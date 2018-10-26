@@ -147,7 +147,8 @@ def send_data():
     encryption_key = os.environ.get('ENCRYPTION_KEY')
     obj = AES.new(encryption_key, AES.MODE_CBC, 'This is an IV456')
 
-    message = "The answer is no " * 32
+    message = Pad.pad("The answer is n".encode())
+    assert not len(message) % 16
 
     ciphertext = obj.encrypt(message)
     response = {
@@ -162,8 +163,8 @@ def send_data():
 def receive_data():
     def decrypt_data(data):
         obj = AES.new(os.environ.get('ENCRYPTION_KEY'), AES.MODE_CBC, 'This is an IV456')
-        hex_data = bytes.fromhex(data)
-        return obj.decrypt(hex_data).decode()
+        bytes_data = bytes.fromhex(data)
+        return Pad.unpad(obj.decrypt(bytes_data)).decode()
 
     def encrypt_data(data):
         obj = AES.new(os.environ.get('ENCRYPTION_KEY'), AES.MODE_CBC, 'This is an IV456')
@@ -184,6 +185,7 @@ def receive_data():
 
         # do something with
         decoded_information = decrypt_data(data['data'])
+        print(decoded_information)
         with open(os.path.join('data_acquisition', '{}.txt'.format(time.time())), 'w') as incoming_data_file:
             incoming_data_file.write(decoded_information)
             logger.info("Data saved.")
