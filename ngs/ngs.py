@@ -143,17 +143,11 @@ def page_not_found(error):
     return render_template('page_not_found.html'), 404
 
 
-@server.route("/sample_data")
+@server.route("/sample-data")
 def send_data():
-    encryption_key = os.environ.get('ENCRYPTION_KEY')
-    obj = AES.new(encryption_key, AES.MODE_CBC, 'This is an IV456')
-
-    message = Pad.pad("The answer is n".encode())
-    assert not len(message) % 16
-
-    ciphertext = obj.encrypt(message)
+    encrypted = DataShare.encrypt_data("The answer is n")
     response = {
-        'data': ciphertext.hex(),
+        'data': encrypted,
         "signature": "dawid",
     }
 
@@ -169,7 +163,6 @@ def receive_data():
             abort(403, "Invalid signature.")
 
         decoded_information = DataShare.decrypt_data(data['data'])
-        print(decoded_information)
         with open(os.path.join('data_acquisition', '{}.txt'.format(time.time())), 'w') as incoming_data_file:
             incoming_data_file.write(decoded_information)
             logger.info("Data saved.")
