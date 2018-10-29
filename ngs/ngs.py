@@ -196,3 +196,4 @@ def add_node():
             json.dump(data, file)
 
         return 'Success', 200
+    abort(403)
