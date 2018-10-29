@@ -1,5 +1,7 @@
 import os
 
+from data_share.KeyGeneration import KeyGeneration
+
 FOLDERS = ['logs', 'data_acquisition', 'nodes']
 
 
@@ -16,6 +18,8 @@ def check_folder(folder_name):
 if __name__ == '__main__':
 
     [check_folder(folder) for folder in FOLDERS]
+    keys = KeyGeneration()
+    keys.load_or_generate()
 
     from ngs.ngs import server
 
