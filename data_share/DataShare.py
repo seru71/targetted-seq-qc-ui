@@ -4,6 +4,10 @@ import json
 from Crypto.Cipher import AES
 from data_share.Pad import Pad
 
+from Crypto.Hash import SHA256
+from Crypto.PublicKey import RSA
+from Crypto import Random
+
 
 class DataShare(object):
 
@@ -23,7 +27,7 @@ class DataShare(object):
         return ciphertext.hex()
 
     @staticmethod
-    def validate_signature(signature):
+    def validate_signature(signature, name=None):
         return signature == 'dawid'
 
     @staticmethod

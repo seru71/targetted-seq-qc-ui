@@ -145,9 +145,10 @@ def page_not_found(error):
 
 @server.route("/sample-data")
 def send_data():
-    encrypted = DataShare.encrypt_data("The answer is n")
+    encrypted = DataShare.encrypt_data("The message.")
     response = {
-        'data': encrypted,
+        "name": 'Laboratory-Warsaw',
+        "data": encrypted,
         "signature": "dawid",
     }
 
@@ -158,7 +159,7 @@ def send_data():
 def receive_data():
     if request.method == 'POST':
         data = json.loads(request.get_json())
-        if not DataShare.validate_signature(data['signature']):
+        if not DataShare.validate_signature(data['signature'], data['name']):
             logger.info("Invalid signature.")
             abort(403, "Invalid signature.")
 

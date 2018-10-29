@@ -4,7 +4,6 @@ class Pad(object):
     def pad(data, base=16):
         assert isinstance(data, bytes)
         length = base - (len(data) % base)
-
         return data + bytes([length]) * length
 
     @staticmethod
