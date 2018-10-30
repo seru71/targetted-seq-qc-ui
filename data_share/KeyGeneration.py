@@ -48,10 +48,3 @@ class KeyGeneration(object):
             self.save_keys()
         else:
             self.load_keys()
-
-
-if __name__ == '__main__':
-    keys = KeyGeneration()
-    private, public = keys.load_keys()
-
-    print(private)

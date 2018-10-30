@@ -3,6 +3,7 @@ import plotly
 import logging
 import os
 import time
+import base64
 
 from Crypto.Cipher import AES
 
@@ -175,11 +176,19 @@ def receive_data():
 
 @server.route('/sample-node', methods=['GET', 'POST'])
 def sample_node():
+
+    path = os.path.join('keys', 'public.key')
+    with open(path, 'rb') as file:
+        public_key = file.read()
+
     response = {
         'name': 'Laboratory-Warsaw',
-        'signature': 'dawid',
         'address': '0.0.0.0',
+        'public_key': DataShare.encrypt_data(base64.b64encode(public_key).decode()),
+        # 'signature': 'dawid'
     }
+
+    response.update({'signature': DataShare.get_signature_for_message(response)})
 
     return jsonify(response), 200
 
@@ -194,6 +203,9 @@ def add_node():
 
         with open(os.path.join('nodes', '{}.json'.format(data['name'])), 'w') as file:
             json.dump(data, file)
+
+        with open(os.path.join('nodes', '{}.key'.format(data['name'])), 'w') as file:
+            file.write(base64.b64decode(DataShare.decrypt_data(data['public_key'])).decode())
 
         return 'Success', 200
     abort(403)

@@ -1,5 +1,6 @@
 import os
 import json
+import base64
 
 from Crypto.Cipher import AES
 from data_share.Pad import Pad
@@ -7,6 +8,10 @@ from data_share.Pad import Pad
 from Crypto.Hash import SHA256
 from Crypto.PublicKey import RSA
 from Crypto import Random
+
+from Crypto.Signature import PKCS1_v1_5
+from Crypto.Hash import SHA
+from Crypto.PublicKey import RSA
 
 
 class DataShare(object):
@@ -27,9 +32,48 @@ class DataShare(object):
         return ciphertext.hex()
 
     @staticmethod
-    def validate_signature(signature, name=None):
-        return signature == 'dawid'
+    def validate_signature(message, signature=None, name=None):
+        # return signature == 'dawid'
+
+        if signature is None:
+            signature = message.pop('signature')
+
+        signature = (int(base64.b64decode(signature).decode()),)
+
+        message = json.dumps(message)
+
+        public_key_path = os.path.join('keys', 'public.key')
+        with open(public_key_path, 'rb') as file:
+            public_key = RSA.importKey(file.read())
+
+        h = SHA.new(message.encode()).digest()
+
+        return public_key.verify(h, signature)
+
+    @staticmethod
+    def get_signature_for_message(message):
+        message = json.dumps(message)
+
+        private_key_path = os.path.join('keys', 'private.key')
+        with open(private_key_path, 'rb') as file:
+            private_key = RSA.importKey(file.read())
+
+        h = SHA.new(message.encode()).digest()
+        signature = private_key.sign(h, '')
+
+        return base64.b64encode(bytes(str(signature[0]).encode()))
 
     @staticmethod
     def prepare_data_for_sending(data):
         return json.dumps(data)
+
+
+if __name__ == '__main__':
+    ds = DataShare()
+    d = {"dawid": 'dawid'}
+    signature = ds.get_signature_for_message(d)
+
+    print(signature)
+
+    x = ds.validate_signature({"dawid": 'dawid'}, signature)
+    print(x)
