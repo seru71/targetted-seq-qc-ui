@@ -18,9 +18,11 @@ class KeyGeneration(object):
         self.public_key = self.private_key.publickey()
 
     def save_keys(self):
-        for key, key_name in [(self.private_key, 'private'), (self.public_key, 'public')]:
-            with open(os.path.join('keys', '{}.key'.format(key_name)), 'wb') as file:
-                file.write(key.exportKey())
+        with open(os.path.join('keys', 'private.key'), 'wb') as file:
+            file.write(self.private_key.exportKey())
+
+        with open(os.path.join('keys', 'public.key'), 'wb') as file:
+            file.write(self.public_key.exportKey())
 
     def load_keys(self):
         self._load_private()

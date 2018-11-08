@@ -146,12 +146,15 @@ def page_not_found(error):
 
 @server.route("/sample-data")
 def send_data():
-    encrypted = DataShare.encrypt_data("The message.")
+    encrypted = DataShare.encrypt_data("The message sdfsdlksjflksjflsdkj.")
+    # response keys must be sorted
     response = {
-        "name": 'Laboratory-Warsaw',
         "data": encrypted,
-        "signature": "dawid",
+        "name": 'Laboratory-Warsaw',
     }
+    print('Data send: ' + json.dumps(response))
+
+    response.update({'signature': DataShare.get_signature_for_message(response)})
 
     return jsonify(response), 200
 
@@ -160,7 +163,8 @@ def send_data():
 def receive_data():
     if request.method == 'POST':
         data = json.loads(request.get_json())
-        if not DataShare.validate_signature(data['signature'], data['name']):
+        print('Data recivied: ' + json.dumps(data))
+        if not DataShare.validate_signature(data):
             logger.info("Invalid signature.")
             abort(403, "Invalid signature.")
 
@@ -182,10 +186,9 @@ def sample_node():
         public_key = file.read()
 
     response = {
-        'name': 'Laboratory-Warsaw',
         'address': '0.0.0.0',
+        'name': 'Laboratory-Warsaw',
         'public_key': DataShare.encrypt_data(base64.b64encode(public_key).decode()),
-        # 'signature': 'dawid'
     }
 
     response.update({'signature': DataShare.get_signature_for_message(response)})
@@ -197,7 +200,7 @@ def sample_node():
 def add_node():
     if request.method == 'POST':
         data = json.loads(request.get_json())
-        if not DataShare.validate_signature(data['signature']):
+        if not DataShare.validate_signature(data):
             logger.info('Invalid signature add-node')
             abort(403, 'Invalid signature.')
 

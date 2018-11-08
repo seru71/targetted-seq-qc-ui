@@ -32,8 +32,8 @@ class DataShare(object):
         return ciphertext.hex()
 
     @staticmethod
-    def validate_signature(message, signature=None, name=None):
-        # return signature == 'dawid'
+    def validate_signature(message, signature=None):
+        # return True
 
         if signature is None:
             signature = message.pop('signature')
@@ -70,10 +70,13 @@ class DataShare(object):
 
 if __name__ == '__main__':
     ds = DataShare()
-    d = {"dawid": 'dawid'}
+    d = {
+        "data": "9cef4a8384657fb6f2f7b66218251734",
+        "name": "Laboratory-Warsaw",
+    }
     signature = ds.get_signature_for_message(d)
 
     print(signature)
 
-    x = ds.validate_signature({"dawid": 'dawid'}, signature)
+    x = ds.validate_signature(d, signature)
     print(x)
