@@ -2,16 +2,14 @@ import json
 import plotly
 import logging
 import os
-import time
+import datetime
 import base64
 
-from Crypto.Cipher import AES
 
 import pandas as pd
 from flask import Flask, render_template, send_from_directory, redirect, url_for, jsonify, request, abort
 
 from ngs.graphs import *
-from data_share.Pad import Pad
 from data_share.DataShare import DataShare
 
 import data_preparation
@@ -169,7 +167,8 @@ def receive_data():
             abort(403, "Invalid signature.")
 
         decoded_information = DataShare.decrypt_data(data['data'])
-        with open(os.path.join('data_acquisition', '{}.txt'.format(time.time())), 'w') as incoming_data_file:
+        filename = str(datetime.datetime.now()).replace(':', "--")
+        with open(os.path.join('data_acquisition', '{}.txt'.format(filename)), 'w') as incoming_data_file:
             incoming_data_file.write(decoded_information)
             logger.info("Data saved.")
 
@@ -187,7 +186,7 @@ def sample_node():
 
     response = {
         'address': '0.0.0.0',
-        'name': 'Laboratory-Warsaw',
+        'name': 'Laboratory-Warsaw2',
         'public_key': DataShare.encrypt_data(base64.b64encode(public_key).decode()),
     }
 
