@@ -216,15 +216,24 @@ def add_node():
 
 @server.route('/variants', methods=['GET', 'POST'])
 def variants_public():
-
     variants_path = os.path.join(os.getcwd(), 'ngs', 'data', 'variants', 'ngs')
-
-    chrom21 = os.path.join(variants_path, 'gnomad.exomes.r2.0.2.sites.ACAFAN.tsv.gz')
-
-    chromosome_results = tabix_query(chrom21, 21, 9825797, 9825799)
-
-    response = {'result': list(chromosome_results)}
+    chrom = os.path.join(variants_path, 'gnomad.exomes.r2.0.2.sites.ACAFAN.tsv.gz')
 
     if request.method == 'POST':
-        return "Dawiddddd", 200
-    return json.dumps(response), 200
+        try:
+            params = request.get_json()
+            genome_build = 'hg19'  # this will be hg19 or hg38
+            chr = params['chr']
+            start = params['start']
+            end = params['end']
+
+            chromosome_results = tabix_query(chrom, chr, start, end)
+            response = {'result': list(chromosome_results)}
+
+            return json.dumps(response), 200
+        except KeyError as e:
+            logger.exception(e)
+            return 'Bad params', 400
+
+    return "Dawiddddd", 200
+
