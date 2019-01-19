@@ -14,6 +14,7 @@ from data_share.DataShare import DataShare
 
 import data_preparation
 import path_processing as pp
+from tabix_wrapper import tabix_query
 
 
 server = Flask(__name__)
@@ -211,3 +212,19 @@ def add_node():
 
         return 'Success', 200
     abort(403)
+
+
+@server.route('/variants', methods=['GET', 'POST'])
+def variants_public():
+
+    variants_path = os.path.join(os.getcwd(), 'ngs', 'data', 'variants', 'ngs')
+
+    chrom21 = os.path.join(variants_path, 'gnomad.exomes.r2.0.2.sites.ACAFAN.tsv.gz')
+
+    chromosome_results = tabix_query(chrom21, 21, 9825797, 9825799)
+
+    response = {'result': list(chromosome_results)}
+
+    if request.method == 'POST':
+        return "Dawiddddd", 200
+    return json.dumps(response), 200
