@@ -139,12 +139,18 @@ def specific_sample(run_id, sample_id):
 
 @server.errorhandler(404)
 def page_not_found(error):
+    """
+    This function renders 404 page.
+    """
     logger.error('Page not found.')
     return render_template('page_not_found.html'), 404
 
 
 @server.route("/sample-data")
 def send_data():
+    """
+    Sample data to be send.
+    """
     encrypted = DataShare.encrypt_data("The message sdfsdlksjflksjflsdkj.")
     # response keys must be sorted
     response = {
@@ -160,6 +166,14 @@ def send_data():
 
 @server.route("/data", methods=['GET', 'POST'])
 def receive_data():
+    """
+    This is an endpoint responsible for sharing the data.
+
+    Performing GET request will result in 403 (unauthorized).
+    Performing POST request will result in sharing the data and saving them into `data_acquisition` folder.
+
+    POST request must be signed. If it is not the node will not be added.
+    """
     if request.method == 'POST':
         data = json.loads(request.get_json())
         print('Data recivied: ' + json.dumps(data))
@@ -174,13 +188,14 @@ def receive_data():
             logger.info("Data saved.")
 
         return "Successful data acquisition", 200
-    else:
-        abort(403)
+    abort(403)
 
 
 @server.route('/sample-node', methods=['GET', 'POST'])
 def sample_node():
-
+    """
+    Sample node data
+    """
     path = os.path.join('keys', 'public.key')
     with open(path, 'rb') as file:
         public_key = file.read()
@@ -198,6 +213,14 @@ def sample_node():
 
 @server.route('/add-node', methods=['GET', 'POST'])
 def add_node():
+    """
+    This is an endpoint which is responsible for adding other laboratory (node) to the federation.
+
+    Performing GET request will result in 403 (unauthorized).
+    Performing POST request will resutl in adding the incoming node to this computer providing the correct data in request.
+
+    POST request must be signed. If it is not the node will not be added.
+    """
     if request.method == 'POST':
         data = json.loads(request.get_json())
         if not DataShare.validate_signature(data):
@@ -216,6 +239,21 @@ def add_node():
 
 @server.route('/variants', methods=['GET', 'POST'])
 def variants_public():
+    """
+    This is an public variants download api that will return variants for a given chromosome from start to end position.
+
+    As a GET request is presents a website how to use this endpoing.
+
+    As a POST request is returns information about variants asked in the POST request data.
+    POST arguments:
+        genome_build (str): information about the genome build (hg19 or hg38)
+        chr (str): chromosome number
+        start (str): starting point
+        end (str): end point
+
+    Having bad post arguments will result in 406 status code.
+    Having problems with running tabix will result in 500 internal error status code.
+    """
     variants_path = os.path.join(os.getcwd(), 'ngs', 'data', 'variants', 'ngs')
     chrom = os.path.join(variants_path, 'gnomad.exomes.r2.0.2.sites.ACAFAN.tsv.gz')
 
@@ -226,14 +264,17 @@ def variants_public():
             chr = params['chr']
             start = params['start']
             end = params['end']
-
-            chromosome_results = tabix_query(chrom, chr, start, end)
-            response = {'result': list(chromosome_results)}
-
-            return json.dumps(response), 200
         except KeyError as e:
             logger.exception(e)
-            return 'Bad params', 400
+            return abort(406)
 
-    return "Dawiddddd", 200
+        try:
+            chromosome_results = tabix_query(chrom, chr, start, end)
+            response = {'result': list(chromosome_results)}
+            return json.dumps(response), 200
+        except Exception as e:
+            logger.exception(e)
+            return abort(500)
+
+    return "Dawid", 200
 

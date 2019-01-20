@@ -17,3 +17,17 @@ def test_encryption():
         information, _, decrypted = check_encrypt_and_decrypt(message)
 
         assert information == decrypted
+
+
+def test_pad():
+    test_message = 'Dawid'.encode()
+
+    padded = data_share.Pad.pad(test_message)
+    assert padded == b'Dawid\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b'
+
+
+def test_pad():
+    padded_message = b'dawid\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b'
+
+    unpadded = data_share.Pad.unpad(padded_message)
+    assert unpadded == b'dawid'

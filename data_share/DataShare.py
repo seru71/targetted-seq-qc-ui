@@ -15,9 +15,18 @@ from Crypto.PublicKey import RSA
 
 
 class DataShare(object):
+    """
+    This class is responsible for data encryption and validating signature.
+    """
 
     @staticmethod
     def decrypt_data(data):
+        """
+        The function takes data argument and decrypts it using ENCRYPTION_KEY. It also unpads the data to be prepared
+        for saving
+        :param data: (str)
+        :return: (str)
+        """
         assert isinstance(data, str)
         obj = AES.new(os.environ.get('ENCRYPTION_KEY'), AES.MODE_CBC, 'This is an IV456')
         bytes_data = bytes.fromhex(data)
@@ -25,6 +34,11 @@ class DataShare(object):
 
     @staticmethod
     def encrypt_data(data):
+        """
+        This function encrypts data and prepares it for sending.
+        :param data: (str) holds unprocessed data to be send
+        :return: (str) data ready to be send
+        """
         assert isinstance(data, str)
         obj = AES.new(os.environ.get('ENCRYPTION_KEY'), AES.MODE_CBC, 'This is an IV456')
         padded = Pad.pad(data.encode())
@@ -33,8 +47,12 @@ class DataShare(object):
 
     @staticmethod
     def validate_signature(message, signature=None):
-        # return True
-
+        """
+        This function checks if incoming message is valid for this machine.
+        :param message: (obj) json incoming message
+        :param signature:
+        :return:
+        """
         if signature is None:
             signature = message.pop('signature')
 
@@ -52,6 +70,11 @@ class DataShare(object):
 
     @staticmethod
     def get_signature_for_message(message):
+        """
+        This function prepares signature for the message.
+        :param message: (obj) json message that needs to be signed
+        :return: (str) b64encoded signature for given message
+        """
         message = json.dumps(message)
 
         private_key_path = os.path.join('keys', 'private.key')
