@@ -2,7 +2,7 @@ import os
 
 from data_share.KeyGeneration import KeyGeneration
 
-FOLDERS = ['logs', 'data_acquisition', 'nodes']
+FOLDERS = ['logs', 'data_acquisition', 'nodes', 'keys']
 
 
 def check_folder(folder_name):
@@ -23,7 +23,8 @@ if __name__ == '__main__':
 
     from ngs.ngs import server
 
-    if int(os.environ.get('FLASK_DEBUG', 0)):
-        server.run(debug=True)
-    else:
-        server.run(host='0.0.0.0')
+    # if int(os.environ.get('FLASK_DEBUG', 0)):
+    #     server.run(debug=True, port=8080, host='0.0.0.0')
+    # else:
+    #     server.run(host='0.0.0.0')
+    server.run(host='0.0.0.0')
