@@ -2,7 +2,7 @@ import os
 import requests
 import json
 
-NODES_PATH = os.path.join('..', 'nodes')
+NODES_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', 'nodes')
 
 
 class NodesChecker(object):
@@ -41,7 +41,7 @@ class NodesChecker(object):
             return False
 
     @staticmethod
-    def get_all_nodes_availability(save=False):
+    def get_all_nodes_availability(save=True):
         all_nodes = NodesChecker.get_all_nodes()
 
         node_availability = {}
@@ -57,9 +57,10 @@ class NodesChecker(object):
             with open('nodes_available.json', 'w') as json_file:
                 json.dump(node_availability, json_file)
 
+        print(node_availability)
         return node_availability
 
 
 if __name__ == '__main__':
     node_checker = NodesChecker()
-    print(NodesChecker.get_all_nodes_availability(save=True))
+    print(NodesChecker.get_all_nodes_availability())

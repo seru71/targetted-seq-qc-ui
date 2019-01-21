@@ -1,6 +1,9 @@
 import os
 
+from apscheduler.schedulers.background import BackgroundScheduler
+
 from data_share.KeyGeneration import KeyGeneration
+from nodes_available.NodesChecker import NodesChecker
 
 FOLDERS = ['logs', 'data_acquisition', 'nodes', 'keys']
 
@@ -15,8 +18,11 @@ def check_folder(folder_name):
         os.mkdir(folder_name)
 
 
-if __name__ == '__main__':
+sched = BackgroundScheduler(daemon=True)
+sched.add_job(NodesChecker.get_all_nodes_availability, 'interval', minutes=1)
+sched.start()
 
+if __name__ == '__main__':
     [check_folder(folder) for folder in FOLDERS]
     keys = KeyGeneration()
     keys.load_or_generate()
