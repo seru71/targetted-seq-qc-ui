@@ -54,13 +54,6 @@ class NodesChecker(object):
             node_availability[node['name']] = data
 
         if save:
-            with open('nodes_available.json', 'w') as json_file:
+            with open(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'nodes_available.json'), 'w') as json_file:
                 json.dump(node_availability, json_file)
-
-        print(node_availability)
         return node_availability
-
-
-if __name__ == '__main__':
-    node_checker = NodesChecker()
-    print(NodesChecker.get_all_nodes_availability())

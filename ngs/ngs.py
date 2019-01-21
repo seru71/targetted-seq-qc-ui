@@ -15,6 +15,7 @@ from data_share.DataShare import DataShare
 import data_preparation
 import path_processing as pp
 from tabix_wrapper import tabix_query
+from nodes_available.NodesChecker import NODES_PATH
 
 
 server = Flask(__name__)
@@ -281,4 +282,7 @@ def variants_public():
 
 @server.route('/nodes', methods=['GET', 'POST'])
 def available_nodes():
-    return 'Nodes', 200
+    available_nodes_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', 'nodes_available', 'nodes_available.json')
+    with open(available_nodes_path, 'r') as json_file:
+        data = json.load(json_file)
+    return render_template('nodes.html', nodes=data)
