@@ -278,3 +278,7 @@ def variants_public():
 
     return "Dawid", 200
 
+
+@server.route('/nodes', methods=['GET', 'POST'])
+def available_nodes():
+    return 'Nodes', 200
