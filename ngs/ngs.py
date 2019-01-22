@@ -277,7 +277,7 @@ def variants_public():
             logger.exception(e)
             return abort(500)
 
-    return "Dawid", 200
+    return render_template('public_variants.html')
 
 
 @server.route('/nodes', methods=['GET', 'POST'])
