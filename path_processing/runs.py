@@ -6,7 +6,12 @@ def get_run_path(run_id):
 
 
 def get_all_runs_names():
-    return os.listdir(FOLDER_WITH_RUNS)
+    all_runs = os.listdir(FOLDER_WITH_RUNS)
+    current_directory = os.getcwd()
+    os.chdir(FOLDER_WITH_RUNS)
+    all_runs.sort(key=os.path.getctime, reverse=True)
+    os.chdir(current_directory)
+    return all_runs
 
 
 # tables and graphs

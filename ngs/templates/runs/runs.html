@@ -2,9 +2,10 @@
 
 {% block content %}
     <h3><b>Runs available:</b></h3>
-    <ul>
-        {% for run in runs %}
-        <li><a href="{{ url_for('.specific_run', run_id=run) }}">{{ run }}</a></li>
+    <div class="list-group">
+        <a href="{{ url_for('.specific_run', run_id=runs[0]) }}" class="list-group-item list-group-item-action">{{ runs[0] }} <span class="badge badge-primary  ">New</span></a>
+        {% for run in runs[1:] %}
+        <a href="{{ url_for('.specific_run', run_id=run) }}" class="list-group-item list-group-item-action">{{ run }}</a>
         {% endfor %}
-    </ul>
+    </div>
 {% endblock %}
